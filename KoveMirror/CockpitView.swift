@@ -51,9 +51,12 @@ struct CockpitView: View {
                                     phoneAppKeepsTFT = false
                                     phoneValue = page.rawValue
                                 }
-                                selectionButton("TFT", selected: showingIndependentTFT && tftValue == page.rawValue, symbol: "display") {
+                                let isTFTSelected = showingIndependentTFT && tftValue == page.rawValue
+                                let onSelectTFT = {
                                     bleController.sendCockpitPage(page)
                                 }
+
+                                selectionButton("TFT", selected: isTFTSelected, symbol: "display", action: onSelectTFT)
                             }
                         }
                         if page != CockpitPage.allCases.last { Divider() }
