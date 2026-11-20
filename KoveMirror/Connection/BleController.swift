@@ -76,11 +76,6 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     
     @Published var isBroadcasting = false
     @Published var isBluetoothPoweredOff = false
-    @Published var isMapViewVisible: Bool = false {
-        didSet {
-            updateCaptureWindowForProximity(isTriggered: CameraProximityManager.shared.isProximityTriggered)
-        }
-    }
     @Published var odoDistanceKm: Double? = nil
     @Published var tripDistanceKm: Double? = nil
     @Published private(set) var motorcycleOdometer: MotorcycleOdometer?
@@ -89,13 +84,31 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     
     private var cancellables = Set<AnyCancellable>()
     @Published private(set) var projectionMode: ProjectionMode = .disconnected
-    @Published private(set) var externalAppMirroringRequested = false
     @Published private(set) var isWebPanelProjectionActive = false
+    @Published private(set) var isPhoneScreenSelected = UserDefaults.standard.bool(forKey: "doubleInterface.phoneScreenSelected")
+
+    func selectPhoneScreen() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        isPhoneScreenSelected = true
+        UserDefaults.standard.set(true, forKey: "doubleInterface.phoneScreenSelected")
+        KoveScreenPreset.broadcastFraming = .fullScreen
+        KoveScreenPreset.keepAspectRatio = true
+        // Bring up the loopback receiver as well as reusing the motorcycle link.
+        resumeConnection()
+        refreshProjectionMode(force: true)
+    }
+
+    func selectMiniature() {
+        dispatchPrecondition(condition: .onQueue(.main))
+        isPhoneScreenSelected = false
+        UserDefaults.standard.set(false, forKey: "doubleInterface.phoneScreenSelected")
+        refreshProjectionMode(force: true)
+    }
 
     func beginWebPanelProjection() {
         isWebPanelProjectionActive = true
-        externalAppMirroringRequested = false
-        if !isStreaming { resumeConnection() }
+        // Display choices work before the bike is connected. Only Connexion
+        // starts/retries its setup; an existing video link is reused here.
         refreshProjectionMode(force: true)
     }
 
@@ -105,44 +118,6 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
         refreshProjectionMode(force: true)
     }
 
-    @discardableResult
-    func beginExternalAppMirroring() -> Bool {
-        guard isStreaming, isBroadcasting else { return false }
-        externalAppMirroringRequested = true
-        refreshProjectionMode()
-        return true
-    }
-
-    func returnToInternalProjection() {
-        externalAppMirroringRequested = false
-        refreshProjectionMode()
-    }
-
-    func sendCockpitPage(_ page: CockpitPage) {
-        log("🖥️ Vue intégrée choisie pour le TFT : " + page.title)
-        UserDefaults.standard.set(page.rawValue, forKey: CockpitSettings.tftKey)
-        UserDefaults.standard.set(true, forKey: CockpitSettings.enabledKey)
-        externalAppMirroringRequested = false
-        if !isStreaming { startMirroring() }
-        refreshProjectionMode(force: true)
-    }
-
-    func returnToPhoneMirror() {
-        UserDefaults.standard.set(false, forKey: CockpitSettings.enabledKey)
-        LocationAndNavigationManager.shared.independentGPXOutput = false
-        externalAppMirroringRequested = false
-        refreshProjectionMode(force: true)
-    }
-    
-    private func setupProximityObserver() {
-        CameraProximityManager.shared.$isProximityTriggered
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] isTriggered in
-                self?.updateCaptureWindowForProximity(isTriggered: isTriggered)
-            }
-            .store(in: &cancellables)
-    }
-    
     private func setupLifecycleObservers() {
         NotificationCenter.default.publisher(for: .webPanelSourceChanged)
             .sink { [weak self] _ in
@@ -198,87 +173,34 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
             DispatchQueue.main.async { [weak self] in self?.refreshProjectionMode(force: force) }
             return
         }
-        let desired: ProjectionMode
-        if isWebPanelProjectionActive {
-            desired = !isStreaming ? .disconnected
-                : (UIApplication.shared.applicationState == .background ? .paused : .screen)
-        } else {
-            desired = ProjectionPolicy.mode(
-            connected: isStreaming,
-            background: UIApplication.shared.applicationState == .background,
-            navigating: LocationAndNavigationManager.shared.isNavigating,
-            lockedModeEnabled: UserDefaults.standard.object(forKey: LockedNavigationStream.enabledKey) as? Bool ?? true,
-            broadcasting: isBroadcasting,
-            independentNavigation: LocationAndNavigationManager.shared.isFollowingGPX
-                && LocationAndNavigationManager.shared.independentGPXOutput,
-            preferBroadcast: externalAppMirroringRequested,
-            independentPanel: CockpitSettings.isEnabled,
-            restrictToBroadcast: KoveScreenPreset.broadcastFraming.requiresBroadcast
-            )
-        }
+        let desired = ProjectionPolicy.dualPanelMode(
+            connected: isStreaming, foreground: UIApplication.shared.applicationState != .background,
+            cockpitVisible: isWebPanelProjectionActive,
+            phoneScreenSelected: isPhoneScreenSelected, broadcasting: isBroadcasting)
         let modeChanged = desired != projectionMode
         guard force || modeChanged else { return }
-        // Stop and drain both encoders before allowing a different producer.
-        captureManager.stopCapture()
-        lockedNavigationStream.stop()
         webPanelStream.stop()
         projectionMode = desired
         ProjectionDiagnostics.shared.setMode(desired)
         if modeChanged { log("📽️ " + desired.rawValue) }
-        switch desired {
-        case .screen:
+        if desired == .screen {
             tcpServerManager.selectVideoSource(.screen)
-            if isWebPanelProjectionActive {
-                webPanelStream.start()
-            } else {
-                let preset = KoveScreenPreset.current
-                captureManager.startCapture(window: activeWindow, width: preset.width, height: preset.height)
-            }
-        case .broadcast:
+            webPanelStream.start()
+        } else if desired == .broadcast {
             tcpServerManager.selectVideoSource(.broadcast)
-        case .navigation:
-            tcpServerManager.selectVideoSource(.navigation)
-            lockedNavigationStream.start()
-        case .paused, .disconnected:
+        } else {
+            // A stopped broadcast cannot fall back to the miniature, nor may
+            // the miniature switch to whole-phone sharing without selection.
             tcpServerManager.selectVideoSource(.paused)
         }
     }
 
-    func updateCaptureWindowForProximity(isTriggered: Bool) {
-        let enableSecondScreen = UserDefaults.standard.bool(forKey: "enableProximitySecondScreen")
-        
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self, self.isStreaming, self.projectionMode == .screen,
-                  !self.isWebPanelProjectionActive,
-                  UIApplication.shared.applicationState != .background else { return }
-            
-            if enableSecondScreen && self.isMapViewVisible && isTriggered {
-                let offscreenWin = OffscreenMapWindowManager.shared.getOrCreateOffscreenWindow()
-                self.captureManager.setTargetWindow(offscreenWin)
-                self.log("🖥️ Proximity covered & MapView active: Switched video stream to 600x1024 offscreen MapView window.")
-            } else {
-                self.captureManager.setTargetWindow(self.activeWindow)
-                OffscreenMapWindowManager.shared.destroyOffscreenWindow()
-                self.log("📱 Switched video stream back to main phone window.")
-            }
-        }
-    }
-    
     private var centralManager: CBCentralManager?
     private var targetPeripheral: CBPeripheral?
     private var writeCharacteristic: CBCharacteristic?
     private let tcpServerManager = TcpServerManager()
     private let locationManager = CLLocationManager()
-    private lazy var captureManager = ScreenCaptureManager(tcpServerManager: tcpServerManager)
-    private lazy var lockedNavigationStream = LockedNavigationStream(server: tcpServerManager)
     private lazy var webPanelStream = WebPanelStream(server: tcpServerManager)
-    
-    private var activeWindow: UIWindow? {
-        return UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
-            .first { $0.isKeyWindow }
-    }
     
     // Service and Characteristic UUIDs matching the ThinkerRide / Kove protocol across models
     let serviceUUID = CBUUID(string: "0000e0ff-3c17-d293-8e48-14fe2e4da212")
@@ -294,7 +216,7 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     private var heartbeatTimer: Timer?
     private var mileageTimer: Timer?
     private var hasSentHandshake = false
-    private let appGroupSuiteName = KoveScreenPreset.appGroupSuiteName
+    private let appGroupSuiteName = "group.com.nicolasrivet.NicoMirror"
     
     private let logQueue = DispatchQueue(label: "com.kove.mirror.log", qos: .utility)
     private let dateFormatter: DateFormatter = {
@@ -352,7 +274,6 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
         centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionRestoreIdentifierKey: "KoveMirrorRestoreID"])
         locationManager.requestAlwaysAuthorization()
         setupLocalConnectionCallback()
-        setupProximityObserver()
         setupLifecycleObservers()
         checkLogFileSizeLimit()
     }
@@ -365,8 +286,7 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
             centralManager = CBCentralManager(delegate: self, queue: nil, options: [CBCentralManagerOptionRestoreIdentifierKey: "KoveMirrorRestoreID"])
             locationManager.requestAlwaysAuthorization()
             setupLocalConnectionCallback()
-            setupProximityObserver()
-            setupLifecycleObservers()
+                setupLifecycleObservers()
             checkLogFileSizeLimit()
             HandlebarKeyManager.shared.logCallback = { [weak self] msg in
                 self?.log(msg)
@@ -1117,7 +1037,6 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     func stopMirroring() {
         tftSessionRequested = false
         log("🎬 Stopping screen capture...")
-        externalAppMirroringRequested = false
         isStreaming = false
         isBroadcasting = false
         refreshProjectionMode(force: true)

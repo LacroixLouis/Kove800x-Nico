@@ -87,11 +87,6 @@ struct KoveMirrorTests {
         encoder.stop()
     }
 
-    @Test func testScreenCaptureManagerInitialization() async throws {
-        let server = TcpServerManager()
-        let _ = ScreenCaptureManager(tcpServerManager: server)
-    }
-
     @Test func testRecordStreamToFile() async throws {
         let encoder = H264Encoder()
         

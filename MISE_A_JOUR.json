@@ -1,5 +1,5 @@
 {
-  "revision": "double-interface-v8-plein-ecran-gps-2026-11-20",
+  "revision": "double-interface-v11-applications-ecran-iphone-2026-11-20",
   "files": [
     {
       "path": "Apercu_RIVET.html",
@@ -78,12 +78,12 @@
     },
     {
       "path": "KoveMirror/About/AboutView.swift",
-      "sha256": "af72b21b6ee20da890c92fbeaebaf5d07ed1433aa337c4a2239034841482a670",
+      "sha256": "a50e679871f8d5553db6c972b71fb2260785c2af56ba4194f9896c64c4f35ee6",
       "mode": "copy"
     },
     {
       "path": "KoveMirror/About/HelpView.swift",
-      "sha256": "c4b8745328130b9cc1c729ac02494ba1c1c13b553b608e8e4e3b6cfbf9e0bd22",
+      "sha256": "daea1eab013fc7f87641c161cc13d5d800459f3380007d6645d5752565796ff2",
       "mode": "copy"
     },
     {
@@ -172,11 +172,6 @@
       "mode": "copy"
     },
     {
-      "path": "KoveMirror/CockpitView.swift",
-      "sha256": "70f73a316fd86b9b33114eb2a807e6856fdcc7dbf15dc9357f4ed61f29bbc844",
-      "mode": "copy"
-    },
-    {
       "path": "KoveMirror/CockpitWeatherWidget.swift",
       "mode": "copy",
       "sha256": "f9ff0f36b3e891da1a012dec685770687e77b3619bd058c742dc14e5975d9b0d"
@@ -188,17 +183,12 @@
     },
     {
       "path": "KoveMirror/Connection/BleController.swift",
-      "sha256": "0790b19e572f23f16e61dc18bfaf5eae7f7d03de20706d19aeefb91149a75c42",
+      "sha256": "ca5a171bd89294570f788e01b9db39f07d53f2c12fd8f6000441131278c4b2dd",
       "mode": "copy"
     },
     {
       "path": "KoveMirror/Connection/LocationAndNavigationManager.swift",
-      "sha256": "493e3fa098849f77032328a2782a36963646e63611b200294ea749469104ea07",
-      "mode": "copy"
-    },
-    {
-      "path": "KoveMirror/Connection/LockedNavigationStream.swift",
-      "sha256": "112dbc83851c4cbc6344050c96cbace7e3ef9fadfcce546702c22ffaf3e33f6c",
+      "sha256": "f89abdde9cf9d3186fc7498765b1a0aa0f3e7ef815fde4a357d430b518c4f420",
       "mode": "copy"
     },
     {
@@ -213,7 +203,7 @@
     },
     {
       "path": "KoveMirror/Connection/TcpServerManager.swift",
-      "sha256": "24090396ae1f9514ee57280bf08ec35d3b867ec520c79c46304fa77900d10723",
+      "sha256": "f1557822ed5f042c412765382342f6858f2df2b1b9afd1159abdff2548ee5f54",
       "mode": "copy"
     },
     {
@@ -223,7 +213,7 @@
     },
     {
       "path": "KoveMirror/ConnectionStatusView.swift",
-      "sha256": "22d0f80015dc59aa1247cc58e791bc2faea8b59592a629c36f3f424359ef6fc1",
+      "sha256": "41363f250843d31028542a921db508d59068985fd040543250f75e47fcc8de53",
       "mode": "copy"
     },
     {
@@ -242,11 +232,6 @@
       "mode": "copy"
     },
     {
-      "path": "KoveMirror/DualScreenOverview.swift",
-      "mode": "copy",
-      "sha256": "e0638df93a1876687b419dfd42ad840ae3c63969fec0a3e3d56967dd02eb8924"
-    },
-    {
       "path": "KoveMirror/GPSHubView.swift",
       "sha256": "166ab62b46f2547e531c17a3c28162cce05904242d735b6ecd6be3c1bc40356f",
       "mode": "copy"
@@ -258,7 +243,7 @@
     },
     {
       "path": "KoveMirror/KoveMirrorApp.swift",
-      "sha256": "76ebe48c4790de51d9b59fd391cb0ce71b602a42883c40963d22046404e30589",
+      "sha256": "63c7a955c19d09d0a89d76a6c5cfdfc4776426a8b8339c1b409ef822b3f4184d",
       "mode": "copy"
     },
     {
@@ -287,21 +272,6 @@
       "mode": "copy"
     },
     {
-      "path": "KoveMirror/Navigation/MapView.swift",
-      "sha256": "2d9944676d0b13c459529d20dd550600dd6c64ce12309a449f64f05268fd41b9",
-      "mode": "copy"
-    },
-    {
-      "path": "KoveMirror/NavigationAppIcon.swift",
-      "mode": "copy",
-      "sha256": "a24d28f9687cbd560defaf883e55c888fc4fad75a8fa38e494818cb17e5e9fa8"
-    },
-    {
-      "path": "KoveMirror/NavigationAppMenu.swift",
-      "sha256": "6966be54fcd1a5f60a10c3f27ad07750332ca9cb8080310af9d8a0bf992a3ce2",
-      "mode": "copy"
-    },
-    {
       "path": "KoveMirror/NormalButtonStyle.swift",
       "sha256": "52665f2832817244d09bb565f0360a77a6a680539f21c231fd80bad7cc0f4865",
       "mode": "copy"
@@ -313,7 +283,7 @@
     },
     {
       "path": "KoveMirror/ProjectionPreparationView.swift",
-      "sha256": "de3477c32dc083db1c805539f911a3ba596012ef3575fbc460dd2cc4b3281c82",
+      "sha256": "7ce6785f01dfe19dacab46f4276c83cf195272c041f21d634b677b63101b4608",
       "mode": "copy"
     },
     {
@@ -339,7 +309,7 @@
     {
       "path": "KoveMirror/SetupViews/DashboardLayout.swift",
       "mode": "copy",
-      "sha256": "71d21a118eeae7d887688269ab515edb351a2a9fbb4b3ac59edc32f8570dcef4"
+      "sha256": "facb50e9d283825bc0cfa5d1979e421c9ea0a0cd60b217aa69e3837e418e8d5f"
     },
     {
       "path": "KoveMirror/SetupViews/MotorcycleMaintenance.swift",
@@ -347,13 +317,8 @@
       "sha256": "e3633f364275d0e47bf20d04faf74e3b83f72638cd8f4d9e724e07c048c00a13"
     },
     {
-      "path": "KoveMirror/SetupViews/NavigationAppChoice.swift",
-      "sha256": "a3617efb1d0479695704eab924b55831311f4de40f769d48201c39ec3d57429b",
-      "mode": "copy"
-    },
-    {
       "path": "KoveMirror/SetupViews/ProjectionPolicy.swift",
-      "sha256": "6ee6223e7c724f660dddb58810f791514b7453750628338f2f850303fe14e528",
+      "sha256": "dc5d6a760b6e5d0a5a0976668c8c80c0c52af30d2ee99034efef19d356667715",
       "mode": "copy"
     },
     {
@@ -373,17 +338,12 @@
     },
     {
       "path": "KoveMirror/SetupViews/SettingsView.swift",
-      "sha256": "6715ea815bc4508f2637c68d9a2ad4ccd2bb1d2362a63bf70cf4fbbc3886fb4d",
+      "sha256": "e018d7aed9c17d74de851c04ca5e2fc9b9bc8ccd6fbeb014c37204e71ca3be5d",
       "mode": "copy"
     },
     {
       "path": "KoveMirror/SetupViews/TFTConnectionPolicy.swift",
       "sha256": "d4a38bd54120e57176fd78594bdb2433545c13b1895e9a9afab9efeeb6505dd1",
-      "mode": "copy"
-    },
-    {
-      "path": "KoveMirror/ShortcutSetupGuide.swift",
-      "sha256": "27b9335ad5732785a7327624c1826ce5cc5d794069fd7f638e02f3988e33d17c",
       "mode": "copy"
     },
     {
@@ -398,7 +358,7 @@
     },
     {
       "path": "LISEZ-MOI.md",
-      "sha256": "8bc5b5de76af3aff0256ad7fcbc484af4842487ddc4d29b8bb235cf17e8623ff",
+      "sha256": "34606417d08a8291c20530f8c0cf1e48e1d6b2c6926c7d6ee1c2e2f8f2421491",
       "mode": "copy"
     },
     {
@@ -433,12 +393,12 @@
     },
     {
       "path": "Package.swift",
-      "sha256": "1d453106bf7dc87c808e3bc1ffd3ea36701756d0dfe71645f9de9c1065e5df82",
+      "sha256": "ddf9b35c347084672317b962af9aa519094fd20661f070fa19a576c755381c03",
       "mode": "copy"
     },
     {
       "path": "README.md",
-      "sha256": "6818c6dd29d53041fc5fb83225cc52d269157478c39a2b6abfa94826e0125424",
+      "sha256": "34606417d08a8291c20530f8c0cf1e48e1d6b2c6926c7d6ee1c2e2f8f2421491",
       "mode": "copy"
     },
     {
@@ -459,7 +419,7 @@
     {
       "path": "Tests/Connection/DashboardLayoutTests.swift",
       "mode": "copy",
-      "sha256": "9a2079148574296b7f24d1a7aadf487969c11d7dd384e293a2b0afb98fe55c2a"
+      "sha256": "63e59168b506cab710ba2e02d243cdf9beeda0a729dd98ac7986706392cf382e"
     },
     {
       "path": "Tests/Connection/MotorcycleMaintenanceTests.swift",
@@ -472,13 +432,8 @@
       "sha256": "a29329c9d5b524899320e17a8ff9a0f9bef4efd16f2738b81ad4c4508c68f95f"
     },
     {
-      "path": "Tests/Connection/NavigationAppChoiceTests.swift",
-      "sha256": "37473f6b33d97f6bcb665ccdab27373fe843d068a6865aecfdb587aad7ab91f4",
-      "mode": "copy"
-    },
-    {
       "path": "Tests/Connection/ProjectionPolicyTests.swift",
-      "sha256": "89f5be7462fb416d5e125d59d486f0ae34e7bb8ad575453fb7eeaae87665b153",
+      "sha256": "dec8a35e71f74fb287297c4792be159cac86c6abc79379a3ac7b8140aea45c92",
       "mode": "copy"
     },
     {
@@ -488,17 +443,17 @@
     },
     {
       "path": "VERIFICATION.json",
-      "sha256": "deed8656e66a03aa004d001f35b1cf5d19893b0eb717a493c2286e53c3076e54",
+      "sha256": "f70db07cf70fb7ea7a2643e72f91e63776727b736a0e7529fc6258a69bfc0b75",
       "mode": "copy"
     },
     {
       "path": "scripts/tests/test_project_update.py",
-      "sha256": "fac830c84311fa62b5eda863366888e18fb811cea043baad1cbde07062d6aa20",
+      "sha256": "2515b0cbd167a578388aaa4e0af545f488787c7001487ed3d6066ec69a457ae3",
       "mode": "copy"
     },
     {
       "path": "scripts/update-project.py",
-      "sha256": "23caf4dab0decb91680e800f9c531deb640675470e94d50e5c50e288e60a6019",
+      "sha256": "1afd6f6e9a7e90b79c3eabec628ab3ed773a0e96844486844e8a7d625fd41659",
       "mode": "copy"
     },
     {
@@ -514,7 +469,7 @@
     {
       "path": "KoveMirror/Shortcuts/KoveShortcuts.swift",
       "mode": "copy",
-      "sha256": "f4d5475c74238675ed67af8b77f711095efd8952c5a67b336a0d1bd99342fc4c"
+      "sha256": "2d0db5442f2cebd287abd27801ec57811b7c0cc8ea359137e31db4fdf92b6d7a"
     },
     {
       "path": "NicoMirror.xcodeproj/project.pbxproj",
@@ -530,11 +485,6 @@
       "path": "CORRECTIF_CONNEXION.md",
       "mode": "copy",
       "sha256": "fbe51c67abc698cd45e5d5fd5227dd068a041dc0d58384f83358913c92a81613"
-    },
-    {
-      "path": "KoveMirror/ScreenCropView.swift",
-      "mode": "copy",
-      "sha256": "71af100c460937911cb13e45efd61003b2821cd22bf90a5d9fb36d45c87db7ba"
     },
     {
       "path": "Tests/Connection/ScreenCropTests.swift",
@@ -569,48 +519,113 @@
     {
       "path": "KoveMirror/SetupViews/WebPanelLayout.swift",
       "mode": "copy",
-      "sha256": "81ca12e9b7c9b75af4a535a3a7e000653591558bc9da8154df6f73591cd33471"
+      "sha256": "8e7e2b73681f9729a466f899f6634f9c09a99326b3921a380b1f75c7948f8dd9"
     },
     {
       "path": "KoveMirror/WebCockpitSession.swift",
       "mode": "copy",
-      "sha256": "c93ac534a656b73b3a69ff11607739093cd354efa180271d6723baa68431904a"
+      "sha256": "00dcfe4aaf23678e031faaa138ea2a7f92825289ea538db02e91e5ea039b352b"
     },
     {
       "path": "KoveMirror/WebCockpitView.swift",
       "mode": "copy",
-      "sha256": "91d5fb17ed6aad117176989a7bf5036853868d08737c1bbc4fa9ba664e4f9845"
+      "sha256": "8bf65218fb1005c3156c9e14d0385d5c475f60c6f5830c9b4c6966327f42fc7b"
     },
     {
       "path": "KoveMirror/Connection/WebPanelStream.swift",
       "mode": "copy",
-      "sha256": "836400dcf1a32313821f856cff9ca6f8cfb6caccbe09c2b858117e3ce5d29c5c"
+      "sha256": "db51de250b0100e95380297edb9cda7abab822f8e496ff46c6c7b9af56b0e505"
     },
     {
       "path": "Tests/Connection/WebPanelLayoutTests.swift",
       "mode": "copy",
-      "sha256": "ed6b6ff5b2cef105a2447da8c86f20abb1b25811d7760ac1414ef4334da953a1"
+      "sha256": "b9bc4de25b97649dcd8144310e7da2f8c1b05becd65a8eacae1c2080e5c096dc"
     },
     {
       "path": "ESSAI_DEUX_ECRANS_WEB.md",
       "mode": "copy",
-      "sha256": "bf1371f0f4d0670214ae337a5d7d8ded2a8cd6cf7cf720203e59099af39f22cd"
+      "sha256": "34606417d08a8291c20530f8c0cf1e48e1d6b2c6926c7d6ee1c2e2f8f2421491"
     },
     {
       "path": "VERIFICATION_ESSAI_WEB.json",
       "mode": "copy",
-      "sha256": "e24e3f54af2326274012ab69f1e77afd12dd7006f34f32371dc359915890f52b"
+      "sha256": "301f08c25953d3e9f0871cba35340b65638ec03230fa14da559611a99fdffa74"
     },
     {
-      "path": "HISTORIQUE_README.md",
+      "path": "KoveMirror/Navigation/IntegratedNavigationPanel.swift",
       "mode": "copy",
-      "sha256": "77aaaa652e9810bf122f22cfb3abfb2bfae3109c488764b30b0ec4119ac29e46"
+      "sha256": "3e3e6b15bcf00f707da6827d583de8a77230096825c0e4e40ea1df571969f44a"
     },
     {
-      "path": "REPRISE_LOUIS.md",
+      "path": "KoveMirrorTests/KoveMirrorTests.swift",
       "mode": "copy",
-      "sha256": "e77f00c4d52d9912f42c2422c104e413fc5f1859e7ce9ed64ec1139a478f8ec8"
+      "sha256": "316de2eafbd0d7a59376b2c4cd392f97eac04e55dc8f877f279ae4c976bf74cf"
+    },
+    {
+      "path": "Verifier_Mac.command",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "7f49b58ac7434ca8773268a2de321ff5df0e4f6aafad95de09ab05a7b1d025a0"
+    },
+    {
+      "path": "Mettre_a_jour_sur_Mac.command",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "c30e9f869a0f0a98f321493ff36e22d6fab9c54ee220995dcc50cec79d6d773a"
+    },
+    {
+      "path": "Installer_sur_iPhone.command",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "d21b932c22872c5b31fb79eaa20c277047cceb97d38ecba4a9b50f414a3d92f3"
+    },
+    {
+      "path": "scripts/build-and-install.sh",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "2a53983fdaa3124508c4f8ab3aa2e9ee8e1ff14738750a9316cd5762f407bd3f"
+    },
+    {
+      "path": "scripts/build-ios.sh",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "f5783969129e964aee81aacfda07a0c9a203ab3b17d6ba9d5b6ac69802a6850f"
+    },
+    {
+      "path": "scripts/check-mac.sh",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "0b4c406c563e968508031b652215e076dcec29d38e9a3d8dd12bfd5047b5d0ac"
+    },
+    {
+      "path": "ci_scripts/ci_post_clone.sh",
+      "mode": "copy",
+      "executable": true,
+      "sha256": "c9f02b5acf839b9fe3007481737deb22fe965aa74d68743cfa56970e8f9c7a2d"
+    },
+    {
+      "path": "KoveMirror/PhoneProjectionView.swift",
+      "mode": "copy",
+      "sha256": "17afd2cf2cc72e7a757235e8ca451a476162c8a4ef66d256442ab6e4719af2fc"
+    },
+    {
+      "path": "ATTENTES_DOUBLE_INTERFACE.md",
+      "mode": "copy",
+      "sha256": "ef837e418618ac271921f400eea957931e62255e4101a2bb668fedb9b094628a"
     }
   ],
-  "distribution": "louis-github"
+  "removed_files": [
+    "KoveMirror/NavigationAppMenu.swift",
+    "KoveMirror/NavigationAppIcon.swift",
+    "KoveMirror/ShortcutSetupGuide.swift",
+    "KoveMirror/SetupViews/NavigationAppChoice.swift",
+    "KoveMirror/CockpitView.swift",
+    "KoveMirror/ScreenCropView.swift",
+    "KoveMirror/Navigation/MapView.swift",
+    "KoveMirror/Connection/OffscreenMapWindowManager.swift",
+    "KoveMirror/Connection/LockedNavigationStream.swift",
+    "KoveMirror/Connection/ScreenCaptureManager.swift",
+    "Tests/Connection/NavigationAppChoiceTests.swift",
+    "KoveMirror/DualScreenOverview.swift"
+  ]
 }

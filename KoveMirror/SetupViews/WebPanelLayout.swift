@@ -22,6 +22,44 @@ struct WebPanelLayout: Codable, Equatable {
     }
 }
 
+enum DualPanelContent: String, Codable, CaseIterable, Identifiable {
+    case empty, navigation, website
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .empty: return "Choisir un contenu"
+        case .navigation: return "Navigation Double Interface"
+        case .website: return "Site web"
+        }
+    }
+}
+
+/// Each renderer has one persistent session. Never duplicate navigation or the
+/// website into both panels, and never alter their identity during an exchange.
+struct DualPanelContents: Codable, Equatable {
+    private enum CodingKeys: String, CodingKey { case first, second }
+    private(set) var first: DualPanelContent = .empty
+    private(set) var second: DualPanelContent = .empty
+
+    func content(_ id: WebPanelID) -> DualPanelContent { id == .first ? first : second }
+
+    @discardableResult
+    mutating func select(_ content: DualPanelContent, for id: WebPanelID) -> Bool {
+        guard content == .empty || self.content(id.other) != content else { return false }
+        if id == .first { first = content } else { second = content }
+        return true
+    }
+
+    init() {}
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        first = try container.decode(DualPanelContent.self, forKey: .first)
+        second = try container.decode(DualPanelContent.self, forKey: .second)
+        if first != .empty && first == second { second = .empty }
+    }
+}
+
 enum WebMapProvider: String, CaseIterable, Codable, Identifiable {
     case waze, wikiloc
     var id: String { rawValue }

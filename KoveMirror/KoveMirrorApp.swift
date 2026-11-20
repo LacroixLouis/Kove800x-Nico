@@ -34,12 +34,6 @@ struct KoveMirrorApp: App {
                     if schemes.contains(url.scheme ?? "") {
                         if url.host == "start" || url.host == "mirror" {
                             BleController.shared?.startMirroring()
-                        } else if url.host == "shortcut-error" {
-                            let message = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?
-                                .first(where: { $0.name == "errorMessage" })?.value
-                            let detail = message.map { String($0.prefix(350)) }
-                                ?? "Vérifie le nom du raccourci iOS et son action « Ouvrir l’app »."
-                            NotificationCenter.default.post(name: .rivetShortcutFailed, object: "L’ouverture par Raccourcis a échoué. " + detail)
                         }
                     }
                 }

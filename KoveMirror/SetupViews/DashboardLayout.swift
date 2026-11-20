@@ -2,6 +2,8 @@ import Foundation
 
 enum DashboardWidget: String, Codable, CaseIterable, Identifiable {
     case applications, weather, maintenance, gps, connection, screens, map
+    // Decode the old applications widget, but no longer offer its launcher.
+    static let allCases: [Self] = [.screens, .weather, .maintenance, .gps, .connection, .map]
     var id: String { rawValue }
     var title: String {
         switch self {
@@ -35,16 +37,17 @@ struct DashboardLayout: Codable, Equatable {
 
     static func initial(second: Bool = false) -> Self {
         Self(order: second
-            ? [.weather, .maintenance, .gps, .connection, .applications, .screens, .map]
-            : [.applications, .weather, .maintenance, .gps, .connection, .screens, .map],
-             hidden: second ? [.applications, .screens] : [])
+            ? [.weather, .maintenance, .gps, .connection, .screens, .map]
+            : [.screens, .weather, .maintenance, .gps, .connection, .map],
+             hidden: second ? [.screens] : [])
     }
 
     static func load(_ text: String, second: Bool = false) -> Self {
         guard let data = text.data(using: .utf8),
               var value = try? JSONDecoder().decode(Self.self, from: data) else { return initial(second: second) }
         var seen = Set<DashboardWidget>()
-        value.order = value.order.filter { seen.insert($0).inserted }
+        value.order = value.order.map { $0 == .applications ? .screens : $0 }.filter { seen.insert($0).inserted }
+        if value.hidden.remove(.applications) != nil { value.hidden.insert(.screens) }
         value.order += DashboardWidget.allCases.filter { !seen.contains($0) }
         return value
     }

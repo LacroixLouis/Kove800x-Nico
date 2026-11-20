@@ -3,37 +3,32 @@ import SwiftUI
 struct HelpView: View {
     var body: some View {
         RideSheet("Un coup de main") {
-            Text("Du téléphone\nau compteur.")
-                .font(.system(.largeTitle, design: .rounded).weight(.bold))
+            Text("Tes deux écrans.").font(.system(.largeTitle, design: .rounded).weight(.bold))
             RideCard {
-                RideSectionTitle(number: "01", title: "Connecter ta Kove")
-                Text("Mets le contact et affiche le mode navigation du compteur. Dans Connexion à la Kove, scanne une fois son QR Wi-Fi et autorise la connexion. Le réseau est enregistré pour la reconnexion au contact. Le réseau peut être indiqué « sans Internet ».")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
-                Text("Si THINKERRIDE utilise déjà la connexion, ferme cette app. Reviens ici et ouvre Connexion à la Kove.")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
+                RideSectionTitle(number: "01", title: "Choisir les contenus")
+                Text("Ouvre Mes deux écrans. Touche le grand écran vide pour choisir la navigation Double Interface ou un site web. Tu peux tout préparer sans connecter la moto.")
             }
             RideCard {
-                RideSectionTitle(number: "02", title: "Choisir tes raccourcis")
-                Text("Menu → Application à afficher → Ajouter une appli. Touche un nom dans la liste, ou saisis le nom d’une autre appli. Pour DMD HUB et les applis ajoutées par leur nom, ouvre-les normalement depuis l’accueil de l’iPhone pendant la diffusion.")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
+                RideSectionTitle(number: "02", title: "Échanger et déplacer")
+                Text("Touche la petite fenêtre : le grand contenu devient petit, et le petit devient grand. Si l’autre fenêtre est vide, touche-la ensuite pour choisir le second contenu. Glisse la miniature pour la déplacer.")
             }
             RideCard {
-                RideSectionTitle(number: "03", title: "Toucher, ouvrir, diffuser")
-                Text("Touche un raccourci. Si nécessaire, termine la connexion et touche le bouton rond de diffusion, puis valide la fenêtre iOS. L’app choisie s’ouvre quand la diffusion et la liaison vidéo sont connectées.")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
-                Text("OsmAnd, Waze, Wikiloc et Plans ont une ouverture directe. Les autres boutons préparent la diffusion et t’indiquent d’ouvrir l’app sur l’iPhone. Les anciens raccourcis iOS déjà configurés sont conservés.")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
+                RideSectionTitle(number: "03", title: "Utiliser la navigation")
+                Text("Affiche la navigation en grand. Destination permet de chercher un lieu et de lancer le guidage. Dans le menu, importe une trace GPX, affiche tout le tracé ou arrête le guidage.")
             }
             RideCard {
-                Label("Comprendre les deux modes", systemImage: "rectangle.on.rectangle").font(.headline)
-                Text("Miroir : le TFT suit tout l’écran de l’iPhone, y compris les changements d’application.")
-                Text("Carte & GPX : l’app peut produire son propre tracé pour le TFT. Ce mode d’essai ne déporte pas une autre app indépendamment.")
-                Text("Écran verrouillé : la liaison utilise une session de trajet avec localisation en arrière-plan. Cela ne permet pas de transmettre l’écran verrouillé d’une autre application. Après l’arrêt du partage complet, iOS demande de le démarrer à nouveau.")
+                RideSectionTitle(number: "04", title: "Connecter ta Kove")
+                Text("Mets le contact et affiche le mode navigation du compteur. Ouvre Connexion, scanne son QR Wi-Fi et autorise la liaison. Retourne aux deux écrans : le TFT reçoit uniquement la miniature, agrandie.")
+                Text("Les menus et le grand écran ne sont pas envoyés au TFT. L’envoi se met en pause quand tu quittes les deux écrans ou que l’iPhone passe en arrière-plan.")
+            }
+            RideCard {
+                Label("Cartes et Internet", systemImage: "globe").font(.headline)
+                Text("La navigation intégrée utilise les cartes Apple. Waze et Wikiloc sont affichés comme sites web. Le calcul routier et les cartes en ligne nécessitent Internet. Les fonctions disponibles sur les sites dépendent de leurs fournisseurs.")
+                Text("Garde Double Interface au premier plan et l’iPhone déverrouillé pour l’envoi de la miniature.")
             }
             RideCard {
                 Label("Une image reste figée ?", systemImage: "pause.rectangle").font(.headline)
-                Text("Une image présente à l’écran ne suffit pas à prouver qu’elle s’actualise. Vérifie la diffusion iOS et la liaison Wi-Fi. Le menu Diagnostic aide à voir le mode de sortie et à partager un rapport.")
-                    .font(.subheadline).foregroundStyle(RideTheme.muted)
+                Text("Vérifie la liaison Wi-Fi et l’état de la miniature dans le menu État et aide. Une image préparée sur l’iPhone ne confirme pas sa réception par le TFT.")
             }
         }
     }

@@ -5,21 +5,25 @@ import WebKit
 import CoreLocation
 
 extension Notification.Name {
+    static let nicoNavigationUpdated = Notification.Name("NicoNavigationUpdated")
     static let webPanelSourceChanged = Notification.Name("DoubleInterfaceWebPanelSourceChanged")
 }
 
-/// Two independent WKWebViews; moving/exchanging panels never reloads them.
-/// This is an experiment with public web maps, not an embedded native app.
+/// One integrated navigation renderer and one website. Panel identities, map
+/// state and web sessions survive exchanges; an empty panel never opens an app.
 final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate, WKUIDelegate {
     static let shared = WebCockpitSession()
-    private static let storageKey = "doubleInterface.webCockpitExperiment.v1"
+    private static let storageKey = "doubleInterface.navigationAndWeb.v1"
     private struct Saved: Codable {
         var layout: WebPanelLayout
         var first: WebPanelPage
         var second: WebPanelPage
+        var contents: DualPanelContents
     }
 
     @Published private(set) var layout = WebPanelLayout()
+    @Published private(set) var contents = DualPanelContents()
+    private(set) var sourceRevision = UUID()
     @Published private(set) var pages: [WebPanelID: WebPanelPage] = [
         .first: WebPanelPage(provider: .wikiloc), .second: WebPanelPage(provider: .waze)
     ]
@@ -33,6 +37,14 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     private var views: [WebPanelID: WKWebView] = [:]
     private var locationSubscription: AnyCancellable?
     private var nearbyRequests: Set<WebPanelID> = []
+    private var navigationRenderer: IntegratedNavigationPanel?
+
+    var navigation: IntegratedNavigationPanel {
+        if let navigationRenderer { return navigationRenderer }
+        let renderer = IntegratedNavigationPanel()
+        navigationRenderer = renderer
+        return renderer
+    }
 
     private override init() {
         super.init()
@@ -41,6 +53,7 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
             layout = saved.layout
             layout.moveMini(x: saved.layout.miniX, y: saved.layout.miniY)
             pages = [.first: saved.first, .second: saved.second]
+            contents = saved.contents
         }
         let manager = LocationAndNavigationManager.shared
         locationSubscription = manager.$userLocation.combineLatest(manager.$authorizationStatus)
@@ -50,6 +63,7 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
                 self.currentLocation = location
                 self.locationAuthorization = authorization
                 self.updateLocationStatus()
+                self.navigationRenderer?.refresh()
                 if self.hasFreshLocation || self.locationNeedsSettings {
                     for id in Array(self.waitingForLocation) {
                         if self.nearbyRequests.contains(id) { self.openNearbyMap(id) }
@@ -82,6 +96,12 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     /// Normal fixes never reload an already open route or a manually moved map.
     func showNearbyMap() {
         let id = layout.phone
+        guard contents.content(id) != .empty else { return }
+        if contents.content(id) == .navigation {
+            beginLocation()
+            navigation.recenter()
+            return
+        }
         nearbyRequests.insert(id)
         LocationAndNavigationManager.shared.requestWebMapLocation()
         openNearbyMap(id)
@@ -90,13 +110,14 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     func continueWithoutLocation(_ id: WebPanelID) {
         nearbyRequests.remove(id)
         waitingForLocation.remove(id)
-        guard let view = views[id], view.url == nil,
+        guard contents.content(id) == .website, let view = views[id], view.url == nil,
               let url = page(id).resolvedURL() else { return }
         messages[id] = "Vue générale · ta position n’est pas encore disponible"
         view.load(URLRequest(url: url))
     }
 
     private func openNearbyMap(_ id: WebPanelID) {
+        guard contents.content(id) == .website else { return }
         guard !locationNeedsSettings else {
             nearbyRequests.remove(id)
             waitingForLocation.remove(id)
@@ -136,6 +157,70 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
         pages[id] ?? WebPanelPage(provider: id == .first ? .wikiloc : .waze)
     }
 
+    func title(_ id: WebPanelID) -> String {
+        contents.content(id) == .website ? page(id).provider.title + " · web" : contents.content(id).title
+    }
+
+    @discardableResult
+    func setContent(_ content: DualPanelContent, for id: WebPanelID) -> Bool {
+        guard contents.select(content, for: id) else { return false }
+        waitingForLocation.remove(id)
+        nearbyRequests.remove(id)
+        if content != .empty { beginLocation() }
+        if content == .navigation {
+            LocationAndNavigationManager.shared.restoreGPX()
+            navigation.refresh()
+        }
+        save()
+        sourceChanged()
+        return true
+    }
+
+    private func sourceChanged() {
+        sourceRevision = UUID()
+        lastSnapshot = nil
+        snapshotError = nil
+        cancelSnapshot()
+        NotificationCenter.default.post(name: .webPanelSourceChanged, object: nil)
+    }
+
+    func cancelSnapshot() { navigationRenderer?.cancelSnapshot() }
+
+    /// Called only for the current miniature, never for the main phone panel.
+    func snapshotTFT(width: CGFloat, completion: @escaping (UIImage?, Error?) -> Void) {
+        let id = layout.tft
+        switch contents.content(id) {
+        case .navigation:
+            navigation.snapshot(width: width, completion: completion)
+        case .website:
+            let view = webView(id)
+            guard view.window != nil, view.bounds.width > 0, view.bounds.height > 0 else {
+                completion(nil, NSError(domain: "DoubleInterface", code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "Le site n’est pas encore affiché dans la miniature."]))
+                return
+            }
+            let configuration = WKSnapshotConfiguration()
+            configuration.rect = view.bounds
+            configuration.snapshotWidth = NSNumber(value: Double(width))
+            view.takeSnapshot(with: configuration, completionHandler: completion)
+        case .empty:
+            let size = canvasSize
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = max(1, width / size.width)
+            let image = UIGraphicsImageRenderer(size: size, format: format).image { context in
+                UIColor(red: 16/255, green: 26/255, blue: 24/255, alpha: 1).setFill()
+                context.fill(CGRect(origin: .zero, size: size))
+                let paragraph = NSMutableParagraphStyle()
+                paragraph.alignment = .center
+                ("Double Interface\n\nChoisis le contenu de la petite fenêtre sur l’iPhone." as NSString)
+                    .draw(in: CGRect(x: 24, y: size.height / 3, width: size.width - 48, height: size.height / 2),
+                        withAttributes: [.font: UIFont.boldSystemFont(ofSize: 20),
+                                         .foregroundColor: UIColor.white, .paragraphStyle: paragraph])
+            }
+            completion(image, nil)
+        }
+    }
+
     func webView(_ id: WebPanelID) -> WKWebView {
         dispatchPrecondition(condition: .onQueue(.main))
         if let view = views[id] { return view }
@@ -157,10 +242,8 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     func exchange() {
         dispatchPrecondition(condition: .onQueue(.main))
         layout.exchange()
-        lastSnapshot = nil
-        snapshotError = nil
         save()
-        NotificationCenter.default.post(name: .webPanelSourceChanged, object: nil)
+        sourceChanged()
     }
 
     func moveMini(x: Double, y: Double) {
@@ -170,20 +253,19 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
 
     @discardableResult
     func setPage(_ page: WebPanelPage, for id: WebPanelID) -> Bool {
-        guard page.resolvedURL() != nil else { return false }
+        guard page.resolvedURL() != nil, contents.select(.website, for: id) else { return false }
         pages[id] = page
         nearbyRequests.remove(id)
         waitingForLocation.remove(id)
+        beginLocation()
         save()
         load(id)
-        if id == layout.tft {
-            lastSnapshot = nil
-            NotificationCenter.default.post(name: .webPanelSourceChanged, object: nil)
-        }
+        sourceChanged()
         return true
     }
 
     func reload(_ id: WebPanelID) {
+        guard contents.content(id) == .website else { return }
         if waitingForLocation.contains(id) || views[id]?.url == nil {
             beginLocation()
             load(id)
@@ -191,6 +273,7 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     }
 
     func goBack(_ id: WebPanelID) {
+        guard contents.content(id) == .website else { return }
         guard let view = views[id], view.canGoBack else { return }
         view.goBack()
     }
@@ -201,14 +284,14 @@ final class WebCockpitSession: NSObject, ObservableObject, WKNavigationDelegate,
     }
 
     private func save() {
-        let saved = Saved(layout: layout, first: page(.first), second: page(.second))
+        let saved = Saved(layout: layout, first: page(.first), second: page(.second), contents: contents)
         if let data = try? JSONEncoder().encode(saved) {
             UserDefaults.standard.set(data, forKey: Self.storageKey)
         }
     }
 
     private func load(_ id: WebPanelID) {
-        guard let view = views[id] else { return }
+        guard contents.content(id) == .website, let view = views[id] else { return }
         let location = freshLocation
         let defaultMap = page(id).address.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         // Initial default maps wait for a real fix instead of opening elsewhere

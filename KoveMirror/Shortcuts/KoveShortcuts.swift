@@ -5,12 +5,11 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct OpenKoveMirrorIntent: AppIntent {
     static var title: LocalizedStringResource = "Open Double Interface"
-    static var description = IntentDescription("Launches Double Interface and readies the screen mirroring connection to your motorcycle.")
+    static var description = IntentDescription("Opens Double Interface to prepare its two panels.")
     static var openAppWhenRun: Bool = true
     
     @MainActor
     func perform() async throws -> some IntentResult {
-        BleController.shared?.startScanning()
         return .result()
     }
 }
@@ -18,7 +17,7 @@ struct OpenKoveMirrorIntent: AppIntent {
 @available(iOS 16.0, *)
 struct StartMirroringIntent: AppIntent {
     static var title: LocalizedStringResource = "Start Screen Mirroring"
-    static var description = IntentDescription("Starts mirroring your screen to the Kove motorcycle dashboard.")
+    static var description = IntentDescription("Connects the Kove dashboard to receive the Double Interface miniature.")
     static var openAppWhenRun: Bool = true
     
     @MainActor

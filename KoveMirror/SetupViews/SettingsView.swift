@@ -3,19 +3,15 @@ import SwiftUI
 struct SettingsView: View {
     @AppStorage("enableFileLogging") private var fileLogging = false
     @AppStorage("enableProximitySensor") private var dimWhenCovered = false
-    @AppStorage("enableProximitySecondScreen") private var secondScreen = false
-    @AppStorage(LockedNavigationStream.enabledKey) private var lockedNavigation = true
     @AppStorage(TFTConnectionPolicy.automaticKey) private var automaticConnection = true
     @AppStorage(TFTConnectionPolicy.lockedKey) private var keepWhenLocked = true
     @AppStorage(TelemetrySyncManager.weatherEnabledKey) private var weatherEnabled = false
     @State private var preset = KoveScreenPreset.current
     @State private var topPadding = KoveScreenPreset.topPadding
     @State private var bottomPadding = KoveScreenPreset.bottomPadding
-    @State private var keepAspect = KoveScreenPreset.keepAspectRatio
     @State private var sharingLog = false
     @State private var missingLog = false
     @State private var choosingLanguage = false
-    @State private var choosingCrop = false
 
     private var logURL: URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -40,7 +36,7 @@ struct SettingsView: View {
                 Toggle("Météo sur le compteur", isOn: $weatherEnabled)
                 Text("La météo est facultative. Si tu l’actives, une position arrondie à deux décimales est transmise à Open-Meteo.")
                     .font(.caption).foregroundStyle(RideTheme.muted)
-                Text("Le trajet utilise la position pour la vitesse et l’altitude du TFT. Autorise la localisation avant de verrouiller l’iPhone. Le miroir d’une autre app peut s’arrêter au verrouillage.")
+                Text("La position sert au guidage et aux données du trajet. Garde Double Interface au premier plan et l’iPhone déverrouillé pour actualiser la miniature sur le TFT.")
                     .font(.caption).foregroundStyle(RideTheme.muted)
             }
             RideCard {
@@ -52,9 +48,6 @@ struct SettingsView: View {
                 Text("Après un changement de format, reconnecte la vidéo au compteur.")
                     .font(.caption).foregroundStyle(RideTheme.muted)
                 Divider()
-                Button("Cadrer une fenêtre pour le TFT", systemImage: "crop") { choosingCrop = true }
-                    .font(.subheadline.weight(.semibold))
-                Toggle("Conserver les proportions", isOn: $keepAspect)
                 marginSlider("Marge haute", value: $topPadding, identifier: "screen.topMargin")
                 marginSlider("Marge basse", value: $bottomPadding, identifier: "screen.bottomMargin")
                 Button("Remettre les marges à zéro", systemImage: "arrow.counterclockwise") {
@@ -67,16 +60,6 @@ struct SettingsView: View {
                 Label("Le téléphone", systemImage: "iphone").font(.headline)
                 Toggle("Assombrir quand il est couvert", isOn: $dimWhenCovered)
                 Text("La caméra détecte la faible lumière. Cela réduit la luminosité sans verrouiller l’iPhone.")
-                    .font(.caption).foregroundStyle(RideTheme.muted)
-                Toggle("Carte intégrée quand il est couvert", isOn: $secondScreen)
-                    .disabled(!dimWhenCovered)
-                Text("Cette option concerne notre carte, pas une autre app de navigation.")
-                    .font(.caption).foregroundStyle(RideTheme.muted)
-            }
-            RideCard {
-                Label("Navigation intégrée", systemImage: "location.north.line").font(.headline)
-                Toggle("Continuer les consignes en arrière-plan", isOn: $lockedNavigation)
-                Text("Mode d’essai pour la navigation intégrée. La continuité réelle sur l’iPhone et le TFT reste à vérifier ; il ne récupère pas l’écran d’OsmAnd ou de Waze.")
                     .font(.caption).foregroundStyle(RideTheme.muted)
             }
             RideCard {
@@ -97,12 +80,10 @@ struct SettingsView: View {
         .onChange(of: preset) { _, value in KoveScreenPreset.current = value }
         .onChange(of: topPadding) { _, value in KoveScreenPreset.topPadding = value }
         .onChange(of: bottomPadding) { _, value in KoveScreenPreset.bottomPadding = value }
-        .onChange(of: keepAspect) { _, value in KoveScreenPreset.keepAspectRatio = value }
         .onChange(of: dimWhenCovered) { _, value in CameraProximityManager.shared.isEnabled = value }
         .onChange(of: weatherEnabled) { _, value in TelemetrySyncManager.shared.setWeatherEnabled(value) }
         .sheet(isPresented: $sharingLog) { ActivityViewController(activityItems: [logURL]) }
         .sheet(isPresented: $choosingLanguage) { AppLanguageView() }
-        .sheet(isPresented: $choosingCrop, onDismiss: { keepAspect = KoveScreenPreset.keepAspectRatio }) { ScreenCropView() }
     }
 
     private func marginSlider(_ title: String, value: Binding<Int>, identifier: String) -> some View {

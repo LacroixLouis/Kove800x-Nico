@@ -442,7 +442,13 @@ class TcpServerManager {
     }
     
     private func handleLocalVideoConnection(_ connection: NWConnection) {
+        let previous = localVideoConnection
         localVideoConnection = connection
+        // A restarted broadcast has its own SPS/PPS and IDR. Do not reuse
+        // decoder state, or let a previous connection cancel the new one.
+        broadcastResynchronizer.reset()
+        previous?.cancel()
+        onLocalConnectionChanged?(false)
         connection.stateUpdateHandler = { [weak self, weak connection] state in
             guard let self, let connection, self.localVideoConnection === connection else { return }
             switch state {
@@ -453,6 +459,8 @@ class TcpServerManager {
                 self.readLocalVideoData(connection)
             case .failed, .cancelled:
                 print("🔌 Local video client disconnected.")
+                self.localVideoConnection = nil
+                self.broadcastResynchronizer.reset()
                 self.onLocalConnectionChanged?(false)
             default:
                 break

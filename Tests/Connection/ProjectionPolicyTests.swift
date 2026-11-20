@@ -3,6 +3,35 @@ import XCTest
 @testable import NicoMirrorConnection
 
 final class ProjectionPolicyTests: XCTestCase {
+    func testPhoneSharingRemainsTheSelectedSourceWhenOpeningAnotherApp() {
+        for foreground in [false, true] {
+            for visible in [false, true] {
+                XCTAssertEqual(ProjectionPolicy.dualPanelMode(connected: true, foreground: foreground,
+                    cockpitVisible: visible, phoneScreenSelected: true, broadcasting: true), .broadcast)
+            }
+        }
+    }
+
+    func testStoppingPhoneSharingNeverSubstitutesTheSavedMiniature() {
+        for foreground in [false, true] {
+            for visible in [false, true] {
+                XCTAssertEqual(ProjectionPolicy.dualPanelMode(connected: true, foreground: foreground,
+                    cockpitVisible: visible, phoneScreenSelected: true, broadcasting: false), .paused)
+            }
+        }
+    }
+
+    func testMiniatureModeDoesNotBroadcastTheWholePhoneWithoutSelection() {
+        for broadcasting in [false, true] {
+            XCTAssertEqual(ProjectionPolicy.dualPanelMode(connected: true, foreground: true,
+                cockpitVisible: true, phoneScreenSelected: false, broadcasting: broadcasting), .screen)
+            XCTAssertEqual(ProjectionPolicy.dualPanelMode(connected: true, foreground: false,
+                cockpitVisible: true, phoneScreenSelected: false, broadcasting: broadcasting), .paused)
+            XCTAssertEqual(ProjectionPolicy.dualPanelMode(connected: false, foreground: true,
+                cockpitVisible: true, phoneScreenSelected: true, broadcasting: broadcasting), .disconnected)
+        }
+    }
+
     func testSelectedWindowPausesWhenTheBroadcastEndsInsteadOfSendingTheWholeApp() {
         for background in [false, true] {
             XCTAssertEqual(ProjectionPolicy.mode(connected: true, background: background,

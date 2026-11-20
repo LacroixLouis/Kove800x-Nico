@@ -1,45 +1,45 @@
 {
-  "revision": "double-interface-v8-plein-ecran-gps-2026-11-20",
-  "checked_at": "2026-11-20T11:46:59+01:00",
-  "based_on_library_version": 14,
+  "revision": "double-interface-v11-applications-ecran-iphone-2026-11-20",
+  "checked_at": "2026-11-20T13:44:47.797562+01:00",
+  "based_on_library_version": 19,
   "changes": [
-    "Full-screen phone web map, floating menu, movable TFT miniature within safe bounds",
-    "Phone viewport matches screen aspect ratio; miniature retains the TFT aspect ratio",
-    "Default maps wait for a fresh real location; explicit trail links remain unchanged",
-    "Current-location map action, permission status, and open-app-settings action",
-    "Foreground location request and documented iOS 27 per-site geolocation prompt"
+    "Application choices restored with Waze, Wikiloc, OsmAnd and Maps.",
+    "Both panel titles open the content picker.",
+    "Explicit full-phone source keeps ReplayKit selected when opening another app.",
+    "Stopped broadcasts pause without falling back to a different renderer.",
+    "Wikiloc uses its official /openApp universal link with universalLinksOnly.",
+    "Embedded upload extension identifier is discovered from the signed app bundle.",
+    "Broadcast restarts reset H.264 resynchronization and replace the previous local connection."
   ],
   "swift_syntax": {
     "parser": "tree-sitter-swift",
-    "files": 84,
+    "files": 74,
     "result": "passed",
     "apple_sdk_type_check": false
   },
   "python_script_tests": {
-    "executed": 16,
+    "executed": 22,
     "result": "passed"
   },
-  "swift_unit_tests_added_for_this_change": 3,
+  "actual_update_smoke_test": {
+    "result": "passed",
+    "from_library_version": 19,
+    "new_swift_file_copied": true,
+    "signing_files_and_project_settings_preserved": true,
+    "URL_identity_preserved": true
+  },
   "swift_unit_tests_executed": false,
   "ios_build_performed": false,
   "device_and_TFT_test_performed": false,
-  "scope": "Two WKWebView sessions, full-screen phone map, draggable miniature, tap-to-exchange, and automatic miniature-only H264 output. Initial centering uses actual fresh coordinates. Moving location dot and continuous following depend on provider web capabilities; native Waze/Wikiloc applications are not embedded.",
-  "runtime_checks_pending": [
-    "Full-screen presentation and safe-area behavior on iPhone",
-    "GPS permission flows and actual map centering for both providers",
-    "Native website geolocation prompts on iOS 27",
-    "TFT output after exchanging panels and rotating the phone"
+  "unfulfilled_requirements": [
+    "Embedding an interactive third-party app in a Double Interface window.",
+    "An independent website and native third-party app running in the two panels simultaneously."
   ],
-  "manifest_integrity": {
-    "files": 120,
-    "result": "passed"
-  },
-  "actual_manifest_update_smoke_test": {
-    "result": "passed",
-    "personal_bundle_identifier_preserved": true,
-    "personal_callback_scheme_preserved": true,
-    "signing_entitlements_preserved": true,
-    "project_settings_byte_for_byte_preserved": true,
-    "updated_swift_files_delivered": true
-  }
+  "runtime_checks_pending": [
+    "Compile and type-check with the Apple SDK.",
+    "Verify both clickable panel titles and miniature drag/exchange on iPhone.",
+    "Open installed Waze, Wikiloc, OsmAnd and Maps; verify explicit failures when unavailable.",
+    "Start and stop the system broadcast and verify live TFT video after opening another app.",
+    "Check foreground/background, stationary and moving operation, disconnect/reconnect, return to miniature and screen lock."
+  ]
 }

@@ -55,14 +55,3 @@ reviewer/
 build/
 .build/
 .swiftpm/
-
-# Local development and signing outputs
-.DS_Store
-__pycache__/
-*.pyc
-DerivedData/
-build-signed-*/
-*.xcresult/
-*.p12
-*.p8
-*.mobileprovision

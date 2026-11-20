@@ -9,7 +9,7 @@ struct AboutView: View {
             Text("Pour Nicolas Rivet · Kove 800X Rally").foregroundStyle(RideTheme.muted)
             RideCard {
                 Label("Une interface à toi", systemImage: "motorcycle.fill").font(.headline)
-                Text("Tes applications GPS favorites, le partage de traces et de positions, et la connexion à ton compteur. Trois vues intégrées permettent aussi d’essayer deux affichages séparés.")
+                Text("Une navigation intégrée et un site web dans deux fenêtres échangeables. La petite fenêtre est envoyée au compteur. Retrouve aussi tes traces GPX, la météo et l’entretien de la moto.")
                 Text("Version " + (Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"))
                     .font(.caption).foregroundStyle(RideTheme.muted)
             }

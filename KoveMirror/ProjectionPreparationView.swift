@@ -4,49 +4,28 @@ struct ProjectionPreparationView: View {
     @ObservedObject var bleController: BleController
     @ObservedObject private var wifi = MotorcycleWiFiManager.shared
     @Binding var pairedSSID: String
-    let appTitle: String?
-    var requiresBroadcast = true
     @State private var showScanner = false
     @State private var password: String?
     @State private var qrError: String?
     @State private var passwordCopied = false
-
-    private var step: TFTPreparationStep {
-        TFTConnectionPolicy.preparationStep(bluetooth: bleController.connectionState == .connected,
-            control: bleController.isTFTControlConnected, video: bleController.isStreaming,
-            broadcasting: bleController.isBroadcasting, requiresBroadcast: requiresBroadcast)
-    }
-
     private var hasSavedSetup: Bool { bleController.hasSavedMotorcycle || wifi.hasSavedNetwork }
 
-    private var title: String {
-        if let appTitle { return "Afficher " + appTitle }
-        return bleController.hasTFTConnection ? "Compteur connecté" : "Connexion à la Kove"
-    }
-
     var body: some View {
-        RideSheet(title) {
-            Text(appTitle.map { $0 + (requiresBroadcast ? " sur ton compteur." : " sur ton iPhone.") }
-                ?? (bleController.isStreaming ? "Ton compteur est prêt." : "La liaison reprend automatiquement."))
+        RideSheet("Connexion") {
+            Text(bleController.isStreaming ? "Ton compteur est connecté." : "Relier ta Kove.")
                 .font(.system(.largeTitle, design: .rounded).weight(.bold))
-            if bleController.hasTFTConnection { connectedCard }
-            else { bluetoothCard }
+            if bleController.hasTFTConnection { connectedCard } else { bluetoothCard }
             if !bleController.isStreaming {
-                if hasSavedSetup {
-                    DisclosureGroup("Configurer ou changer la connexion") { wifiCard }
-                } else { wifiCard }
+                if hasSavedSetup { DisclosureGroup("Configurer ou changer la connexion") { wifiCard } }
+                else { wifiCard }
             }
-            if step == .startBroadcast { broadcastCard }
-            else if step == .ready && requiresBroadcast {
-                Label("Diffusion active", systemImage: "record.circle.fill")
-                    .font(.headline).foregroundStyle(RivetCockpit.lime)
-            } else if !requiresBroadcast {
-                RideCard {
-                    Label("Le TFT garde sa vue Double Interface", systemImage: "display")
-                        .font(.headline)
-                    Text("Le partage complet de l’écran n’est pas nécessaire pour ce mode.")
-                        .foregroundStyle(RideTheme.muted)
-                }
+            RideCard {
+                Label(bleController.isPhoneScreenSelected ? "L’écran de l’iPhone sur le TFT" : "La petite fenêtre sur le TFT",
+                      systemImage: bleController.isPhoneScreenSelected ? "iphone" : "rectangle.inset.bottomtrailing").font(.headline)
+                Text(bleController.isPhoneScreenSelected
+                     ? "Dans le choix des applications, démarre la diffusion iOS. Le TFT reçoit alors l’écran complet du téléphone, y compris l’application que tu ouvres."
+                     : "Retourne dans Mes deux écrans : le contenu de la miniature est envoyé automatiquement. Tu peux préparer les deux fenêtres avant de connecter la moto.")
+                    .font(.subheadline).foregroundStyle(RideTheme.muted)
             }
         }
         .sheet(isPresented: $showScanner) {
@@ -76,7 +55,9 @@ struct ProjectionPreparationView: View {
                     .font(.subheadline).foregroundStyle(RideTheme.muted)
             } else {
                 ProgressView("Préparation de l’envoi au compteur…")
-                Text("L’application choisie s’ouvrira dès que le canal vidéo sera prêt.")
+                Text(bleController.isPhoneScreenSelected
+                     ? "L’écran du téléphone sera envoyé quand la diffusion iOS et la liaison vidéo seront prêtes."
+                     : "La petite fenêtre sera envoyée quand la liaison vidéo sera prête.")
                     .font(.subheadline).foregroundStyle(RideTheme.muted)
             }
         }
@@ -132,32 +113,4 @@ struct ProjectionPreparationView: View {
         }
     }
 
-    private var broadcastCard: some View {
-        RideCard {
-            RideSectionTitle(number: "03", title: "Diffuser l’écran")
-            if bleController.isBroadcasting {
-                Label("Diffusion connectée", systemImage: "checkmark.circle.fill").font(.headline)
-                if appTitle != nil {
-                    Text("L’application choisie va s’ouvrir dès que la liaison vidéo est prête.")
-                        .font(.subheadline).foregroundStyle(RideTheme.muted)
-                }
-            } else {
-                HStack(spacing: 16) {
-                    ScreenBroadcastControl(enabled: bleController.isStreaming).frame(width: 48, height: 48)
-                        .disabled(!bleController.isStreaming)
-                        .opacity(bleController.isStreaming ? 1 : 0.3)
-                    Text("Touche le bouton rond, sélectionne « " + ScreenBroadcastControl.serviceName + " », puis « Démarrer la diffusion » dans la fenêtre iOS.")
-                        .font(.subheadline).foregroundStyle(RideTheme.muted)
-                }
-                if !bleController.isStreaming {
-                    Text("Ce bouton devient disponible quand le compteur est relié.")
-                        .font(.caption).foregroundStyle(RideTheme.muted)
-                }
-            }
-            Text("La diffusion reste active pour les applications suivantes jusqu’à son arrêt.")
-                .font(.caption).foregroundStyle(RideTheme.muted)
-            Text("La diffusion suit l’écran visible de l’iPhone. Tu peux sélectionner une zone à agrandir dans Menu → Cadrage du TFT.")
-                .font(.caption).foregroundStyle(RideTheme.muted)
-        }
-    }
 }

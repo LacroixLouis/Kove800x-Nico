@@ -1,4 +1,4 @@
-name: Vérifier Double Interface
+name: Compiler NicoMirror
 on:
   workflow_dispatch:
 permissions:

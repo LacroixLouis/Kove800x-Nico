@@ -1,9 +1,8 @@
 import UIKit
-import WebKit
 import CoreMedia
 import CoreVideo
 
-/// Snapshots ONLY the miniature's WKWebView. The main map, keyboard, sheets,
+/// Snapshots ONLY the miniature's native map or website. The main map, keyboard, sheets,
 /// miniature position and application chrome are never sent by this producer.
 final class WebPanelStream: H264EncoderDelegate {
     private let server: TcpServerManager
@@ -19,7 +18,7 @@ final class WebPanelStream: H264EncoderDelegate {
         self.server = server
         encoder.delegate = self
         encoder.onError = { status in
-            ProjectionDiagnostics.shared.recordError("Essai web : encodeur TFT \(status)")
+            ProjectionDiagnostics.shared.recordError("Double Interface : encodeur TFT \(status)")
             DispatchQueue.main.async {
                 WebCockpitSession.shared.recordSnapshot(error: "Erreur de préparation de l’image TFT (\(status)).")
             }
@@ -50,6 +49,7 @@ final class WebPanelStream: H264EncoderDelegate {
         active = false
         generation += 1
         snapshotPending = false
+        WebCockpitSession.shared.cancelSnapshot()
         timer?.invalidate()
         timer = nil
         encoder.stop()
@@ -58,10 +58,10 @@ final class WebPanelStream: H264EncoderDelegate {
     private func capture() {
         guard active, UIApplication.shared.applicationState == .active else { return }
         let now = ProcessInfo.processInfo.systemUptime
-        // A stalled WebKit callback must not lock the capture loop permanently.
+        // A stalled map or website callback must not lock the capture loop.
         if snapshotPending {
             if now - pendingSince > 8 {
-                WebCockpitSession.shared.recordSnapshot(error: "La carte web ne fournit plus d’image. Actualise-la.")
+                WebCockpitSession.shared.recordSnapshot(error: "La miniature ne fournit plus d’image. Actualise-la.")
                 generation += 1
                 snapshotPending = false
             }
@@ -69,21 +69,17 @@ final class WebPanelStream: H264EncoderDelegate {
         }
         let session = WebCockpitSession.shared
         let id = session.layout.tft
-        let view = session.webView(id)
-        guard view.window != nil, view.bounds.width > 0, view.bounds.height > 0 else { return }
+        let revision = session.sourceRevision
         snapshotPending = true
         pendingSince = now
         let token = generation
-        let configuration = WKSnapshotConfiguration()
-        configuration.rect = view.bounds
-        configuration.snapshotWidth = NSNumber(value: Double(outputSize.width))
-        view.takeSnapshot(with: configuration) { [weak self] image, error in
+        session.snapshotTFT(width: outputSize.width) { [weak self] image, error in
             DispatchQueue.main.async {
                 guard let self, self.active, self.generation == token else { return }
                 self.snapshotPending = false
-                guard session.layout.tft == id else { return }
+                guard session.layout.tft == id, session.sourceRevision == revision else { return }
                 guard let image, let buffer = self.pixelBuffer(image) else {
-                    session.recordSnapshot(error: error?.localizedDescription ?? "La carte web ne fournit pas d’image.")
+                    session.recordSnapshot(error: error?.localizedDescription ?? "La miniature ne fournit pas d’image.")
                     return
                 }
                 let pts = CMTime(value: Int64(ProcessInfo.processInfo.systemUptime * 1000), timescale: 1000)

@@ -32,7 +32,7 @@ def update_project(source, target):
     if "PBXFileSystemSynchronizedRootGroup" not in project.read_text():
         raise ValueError("La structure de ce projet ne permet pas l’ajout automatique des nouveaux fichiers.")
     manifest = json.loads((source / "MISE_A_JOUR.json").read_text())
-    plans, seen = [], set()
+    plans, seen, planned_modes = [], set(), {}
     for entry in manifest["files"]:
         relative = entry["path"]
         if relative in seen:
@@ -44,6 +44,11 @@ def update_project(source, target):
         if (".xcodeproj" in relative and not project_branding) or (relative.endswith(".entitlements") and not hotspot_merge):
             raise ValueError("La mise à jour ne doit pas modifier les identifiants de signature.")
         src, dst = safe_path(source, relative), safe_path(target, relative)
+        executable = entry.get("executable", False)
+        if not isinstance(executable, bool) or (executable and not relative.endswith((".command", ".sh"))):
+            raise ValueError("Le droit d’exécution est réservé aux scripts de lancement.")
+        permissions = (dst.stat().st_mode & 0o777) if dst.exists() else 0o644
+        planned_modes[relative] = permissions | 0o111 if executable else permissions
         data = src.read_bytes()
         if hashlib.sha256(data).hexdigest() != entry["sha256"]:
             raise ValueError("Le fichier de mise à jour a changé : " + relative)
@@ -105,6 +110,21 @@ def update_project(source, target):
             raise ValueError("Type de mise à jour inconnu.")
         plans.append((relative, dst, data))
 
+    for relative in manifest.get("removed_files", []):
+        if relative in seen:
+            raise ValueError("Suppression dupliquée ou en conflit avec un fichier à copier.")
+        seen.add(relative)
+        # Only obsolete source/test files may be removed. Signing, project
+        # configuration, user documents and data are never deletion targets.
+        if not isinstance(relative, str) or not relative.endswith(".swift") or not relative.startswith(
+                ("KoveMirror/", "KoveMirrorTests/", "Tests/Connection/")):
+            raise ValueError("Suppression réservée aux anciens fichiers source.")
+        dst = safe_path(target, relative)
+        if dst.exists():
+            if not dst.is_file():
+                raise ValueError("Une suppression ne doit pas viser un dossier.")
+            plans.append((relative, dst, None))
+
     backup = Path(tempfile.mkdtemp(prefix="Sauvegarde_Double_Interface_" + datetime.now().strftime("%Y%m%d_%H%M%S_"),
                                   dir=target.parent))
     prior = {}
@@ -119,12 +139,16 @@ def update_project(source, target):
     written = []
     try:
         for relative, dst, data in plans:
+            if data is None:
+                dst.unlink()
+                written.append((relative, dst))
+                continue
             dst.parent.mkdir(parents=True, exist_ok=True)
             with tempfile.NamedTemporaryFile(dir=dst.parent, delete=False) as stream:
                 stage = Path(stream.name)
                 stream.write(data)
             try:
-                os.chmod(stage, (dst.stat().st_mode & 0o777) if dst.exists() else 0o644)
+                os.chmod(stage, planned_modes[relative])
                 os.replace(stage, dst)
                 written.append((relative, dst))
             finally:
@@ -137,7 +161,9 @@ def update_project(source, target):
             else:
                 shutil.copy2(saved, dst)
         raise
-    return {"updated_files": len(plans), "backup": str(backup), "project": str(project.parent)}
+    return {"updated_files": sum(data is not None for _, _, data in plans),
+            "removed_files": sum(data is None for _, _, data in plans),
+            "backup": str(backup), "project": str(project.parent)}
 
 
 def main():
@@ -150,6 +176,7 @@ def main():
     except Exception as error:
         parser.exit(1, "Mise à jour arrêtée : " + str(error) + "\n")
     print("Mise à jour appliquée : " + str(result["updated_files"]) + " fichiers.")
+    print("Anciens fichiers retirés : " + str(result["removed_files"]) + ".")
     print("Sauvegarde de la version précédente : " + result["backup"])
     print("Les identifiants, l’équipe Apple et les groupes partagés ont été conservés.")
     print("Le Wi-Fi peut être associé une fois dans les Réglages de l’iPhone ; ses réglages Apple existants sont conservés.")

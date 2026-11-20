@@ -38,5 +38,7 @@
   "ios_compilation_performed": false,
   "apple_signing_performed": false,
   "new_revision_installed_on_iphone": false,
-  "motorcycle_hardware_test_performed": false
+  "motorcycle_hardware_test_performed": false,
+  "historical_report": true,
+  "current_verification": "VERIFICATION_ESSAI_WEB.json"
 }

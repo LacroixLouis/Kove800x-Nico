@@ -97,4 +97,54 @@ final class WebPanelLayoutTests: XCTestCase {
         XCTAssertNil(WebPanelPage(provider: .wikiloc, address: "https://www.waze.com/").resolvedURL())
         XCTAssertNil(WebPanelPage(provider: .wikiloc, address: "https://fakewikiloc.com/").resolvedURL())
     }
+    func testEmptyPanelsCanBecomeNavigationAndWebsiteWithoutConnection() {
+        var contents = DualPanelContents()
+        var layout = WebPanelLayout()
+        XCTAssertEqual(contents.content(layout.phone), .empty)
+        XCTAssertEqual(contents.content(layout.tft), .empty)
+        XCTAssertTrue(contents.select(.navigation, for: layout.phone))
+        layout.exchange()
+        XCTAssertEqual(contents.content(layout.tft), .navigation)
+        XCTAssertEqual(contents.content(layout.phone), .empty)
+        XCTAssertTrue(contents.select(.website, for: layout.phone))
+        for _ in 0..<20 {
+            layout.exchange()
+            XCTAssertNotEqual(contents.content(layout.phone), contents.content(layout.tft))
+            XCTAssertEqual(Set([contents.first, contents.second]), [.navigation, .website])
+        }
+    }
+
+    func testRendererCannotBeDuplicatedAndClearingOnePreservesTheOther() {
+        var contents = DualPanelContents()
+        XCTAssertTrue(contents.select(.navigation, for: .first))
+        XCTAssertFalse(contents.select(.navigation, for: .second))
+        XCTAssertTrue(contents.select(.website, for: .second))
+        XCTAssertFalse(contents.select(.website, for: .first))
+        XCTAssertTrue(contents.select(.empty, for: .first))
+        XCTAssertEqual(contents.second, .website)
+        XCTAssertTrue(contents.select(.navigation, for: .first))
+    }
+
+    func testContentsSurviveReloadAndCorruptedDuplicatesRecover() throws {
+        var contents = DualPanelContents()
+        contents.select(.website, for: .first)
+        contents.select(.navigation, for: .second)
+        XCTAssertEqual(try JSONDecoder().decode(DualPanelContents.self, from: JSONEncoder().encode(contents)), contents)
+        let data = Data(#"{"first":"navigation","second":"navigation"}"#.utf8)
+        let recovered = try JSONDecoder().decode(DualPanelContents.self, from: data)
+        XCTAssertEqual(recovered.first, .navigation)
+        XCTAssertEqual(recovered.second, .empty)
+    }
+
+    func testDualOutputIsPausedOutsideCockpitAndWhenBackgrounded() {
+        for connected in [false, true] {
+            for foreground in [false, true] {
+                for visible in [false, true] {
+                    let mode = ProjectionPolicy.dualPanelMode(connected: connected, foreground: foreground, cockpitVisible: visible)
+                    XCTAssertEqual(mode, !connected ? .disconnected : (foreground && visible ? .screen : .paused))
+                }
+            }
+        }
+    }
+
 }

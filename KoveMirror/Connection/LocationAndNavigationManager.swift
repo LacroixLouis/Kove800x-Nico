@@ -281,7 +281,7 @@ class LocationAndNavigationManager: NSObject, ObservableObject, CLLocationManage
         
         // Announce navigation start
         let destName = destination.name ?? "destination"
-        speakInstruction("Starting route to \(destName). Ride safely.")
+        speakInstruction("Départ vers \(destName). Bonne route.")
         
         // Sync turn-by-turn navigation with Kove TFT Dashboard over BLE
         NavigationSyncManager.shared.startNavigation(route: route, destination: destination)

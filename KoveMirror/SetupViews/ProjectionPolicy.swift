@@ -3,13 +3,23 @@ import Foundation
 enum ProjectionMode: String, Codable {
     case disconnected = "Vidéo du compteur déconnectée"
     case paused = "Envoi des images en pause"
-    case screen = "Miroir intégré"
+    case screen = "Petite fenêtre de Double Interface"
     case broadcast = "Diffusion de l'écran"
     case navigation = "Navigation TFT indépendante · essai"
 }
 
 /// Pure decision logic, shared with the portable regression tests.
 struct ProjectionPolicy {
+    static func dualPanelMode(connected: Bool, foreground: Bool, cockpitVisible: Bool,
+                              phoneScreenSelected: Bool = false, broadcasting: Bool = false) -> ProjectionMode {
+        guard connected else { return .disconnected }
+        // Full-phone sharing is an explicit source. It must survive opening a
+        // native app, and must pause if permission/sharing ends, never substitute
+        // a saved web map or a screenshot from the host app.
+        if phoneScreenSelected { return broadcasting ? .broadcast : .paused }
+        return foreground && cockpitVisible ? .screen : .paused
+    }
+
     static func mode(connected: Bool, background: Bool, navigating: Bool,
                      lockedModeEnabled: Bool, broadcasting: Bool, independentNavigation: Bool = false,
                      preferBroadcast: Bool = false, independentPanel: Bool = false,

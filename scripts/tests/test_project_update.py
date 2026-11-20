@@ -26,6 +26,7 @@ class ProjectUpdateTests(unittest.TestCase):
         (self.target / "KoveMirror/Connection/BleController.swift").write_text("old controller")
         (self.target / "KoveMirror/KoveMirror.entitlements").write_text("keep entitlements")
         self.entries = []
+        self.removed = []
 
     def add(self, name, new, old=None, mode="copy"):
         src = self.source / name
@@ -37,7 +38,7 @@ class ProjectUpdateTests(unittest.TestCase):
         self.entries.append({"path": name, "sha256": hashlib.sha256(new).hexdigest(), "mode": mode})
 
     def run_update(self):
-        (self.source / "MISE_A_JOUR.json").write_text(json.dumps({"files": self.entries}))
+        (self.source / "MISE_A_JOUR.json").write_text(json.dumps({"files": self.entries, "removed_files": self.removed}))
         return MODULE.update_project(self.source, self.target)
 
     def test_updates_files_and_backs_up_without_changing_signing(self):
@@ -193,6 +194,75 @@ class ProjectUpdateTests(unittest.TestCase):
             with self.assertRaises(OSError): self.run_update()
         self.assertEqual((self.target / "KoveMirror/Connection/BleController.swift").read_bytes(), b"old")
         self.assertFalse((self.target / "KoveMirror/NewView.swift").exists())
+
+    def test_removes_obsolete_source_with_backup_and_preserves_signing(self):
+        obsolete = self.target / "KoveMirror/OldLauncher.swift"
+        obsolete.write_text("old app launcher")
+        self.removed = ["KoveMirror/OldLauncher.swift", "KoveMirror/AlreadyRemoved.swift"]
+        self.add("KoveMirror/NewPanel.swift", b"new panel")
+        before = self.project.read_bytes()
+        result = self.run_update()
+        self.assertEqual(result["removed_files"], 1)
+        self.assertEqual(result["updated_files"], 1)
+        self.assertFalse(obsolete.exists())
+        self.assertEqual((Path(result["backup"]) / self.removed[0]).read_text(), "old app launcher")
+        self.assertEqual(self.project.read_bytes(), before)
+        self.assertEqual((self.target / "KoveMirror/KoveMirror.entitlements").read_text(), "keep entitlements")
+
+    def test_invalid_deletions_prevent_all_writes(self):
+        self.add("KoveMirror/NewPanel.swift", b"new")
+        for name in ["../outside.swift", "KoveMirror/../outside.swift",
+                     "NicoMirror.xcodeproj/project.pbxproj", "KoveMirror/Info.plist",
+                     "KoveMirror/KoveMirror.entitlements", "user/notes.swift"]:
+            with self.subTest(name=name):
+                self.removed = [name]
+                with self.assertRaises(ValueError):
+                    self.run_update()
+                self.assertFalse((self.target / "KoveMirror/NewPanel.swift").exists())
+
+    def test_failed_deletion_restores_removed_and_updated_files(self):
+        first = self.target / "KoveMirror/FirstObsolete.swift"
+        second = self.target / "KoveMirror/SecondObsolete.swift"
+        first.write_text("first original")
+        second.write_text("second original")
+        self.removed = ["KoveMirror/FirstObsolete.swift", "KoveMirror/SecondObsolete.swift"]
+        self.add("KoveMirror/Connection/BleController.swift", b"updated controller", b"old controller")
+        unlink = Path.unlink
+        def fail_second(path, *args, **kwargs):
+            if path == second:
+                raise OSError("simulated deletion failure")
+            return unlink(path, *args, **kwargs)
+        with patch.object(Path, "unlink", fail_second):
+            with self.assertRaises(OSError):
+                self.run_update()
+        self.assertEqual(first.read_text(), "first original")
+        self.assertEqual(second.read_text(), "second original")
+        self.assertEqual((self.target / "KoveMirror/Connection/BleController.swift").read_text(), "old controller")
+
+    def test_launcher_gets_execute_rights_for_existing_and_new_files(self):
+        self.add("Mettre_a_jour_sur_Mac.command", b"#!/bin/bash\nexit 0\n", b"old launcher")
+        self.entries[-1]["executable"] = True
+        target = self.target / "Mettre_a_jour_sur_Mac.command"
+        target.chmod(0o644)
+        self.add("scripts/new.sh", b"#!/bin/bash\nexit 0\n")
+        self.entries[-1]["executable"] = True
+        self.run_update()
+        self.assertEqual(target.stat().st_mode & 0o777, 0o755)
+        self.assertEqual((self.target / "scripts/new.sh").stat().st_mode & 0o777, 0o755)
+
+    def test_non_scripts_cannot_request_execute_rights(self):
+        self.add("KoveMirror/NewPanel.swift", b"new panel")
+        self.entries[-1]["executable"] = True
+        with self.assertRaises(ValueError):
+            self.run_update()
+        self.assertFalse((self.target / "KoveMirror/NewPanel.swift").exists())
+
+    def test_non_executable_files_preserve_their_permissions(self):
+        self.add("KoveMirror/NewPanel.swift", b"new", b"old")
+        target = self.target / "KoveMirror/NewPanel.swift"
+        target.chmod(0o640)
+        self.run_update()
+        self.assertEqual(target.stat().st_mode & 0o777, 0o640)
 
 
 if __name__ == "__main__":

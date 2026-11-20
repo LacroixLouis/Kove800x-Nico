@@ -1,92 +1,46 @@
-# Essai deux écrans — Waze et Wikiloc sur le Web
+# Double Interface — applications et diffusion iPhone
 
-## Installation sur ton Mac
+Les deux fenêtres s’ouvrent directement. Touche le titre du grand écran ou la barre de titre de la miniature pour choisir. Touche l’image de la miniature pour échanger ; glisse-la pour la déplacer.
 
-1. Ferme l’application sur l’iPhone et décompresse ce nouveau dossier.
-2. Dans le dossier, ouvre `Mettre_a_jour_sur_Mac.command`.
-3. Choisis ton ancien dossier de projet, celui déjà signé dans Xcode.
-4. Branche l’iPhone, garde-le comme destination dans Xcode puis fais **Commande + R**.
+## Ouvrir une vraie application
 
-La mise à jour sauvegarde le projet existant et conserve ses identifiants de signature.
+Le choix affiche maintenant **Applications iPhone** avec Waze, Wikiloc, OsmAnd et Plans. Choisir une app ouvre son panneau de diffusion. **Ouvrir Waze / Wikiloc / OsmAnd / Plans** lance l’application sur l’iPhone, même avant de connecter la moto. Une application absente ou un lien refusé affiche un message ; aucun site web n’est ouvert à sa place.
 
-## Ce qui est ajouté
+Wikiloc utilise son lien officiel `https://www.wikiloc.com/openApp`, déclaré dans son association d’applications iOS. Waze et OsmAnd utilisent leurs liens d’applications ; Plans utilise MapKit.
 
-Sur l’accueil de Double Interface, ouvre **Deux écrans · essai web**.
-Deux fenêtres apparaissent immédiatement : Wikiloc en grand, Waze en miniature.
-La grande carte occupe tout l’écran, sans cadre ni bande de texte. Le menu
-flottant « … » regroupe le choix des cartes, l’actualisation, l’aide et la fermeture.
-La miniature reste déplaçable et sa position tient compte de l’encoche et des bords.
-La connexion TFT existante est réutilisée ; le contenu de la miniature devient
-automatiquement la seule source vidéo de ce mode. Aucun cadrage à régler, aucune
-diffusion iOS supplémentaire à démarrer pour ce mode.
+## Envoyer cette application au TFT
 
-- Touche directement la miniature : elle passe en grand, l’autre carte devient
-  la miniature et sa source est alors envoyée au TFT.
-- Fais glisser la miniature : elle reste dans l’écran. Sa position ne modifie
-  pas la source du TFT.
-- Les deux sessions web conservent leurs pages pendant les échanges.
-- Le grand écran reste utilisable : déplacement de carte, zoom, liens et champs
-  que le site permet d’utiliser.
-- Le menu « … », puis « Choisir les cartes web », permet de choisir une carte ou de coller un lien/code
-  d’intégration de trace Wikiloc. Les réglages ne sont pas envoyés au TFT.
-- « Fermer les deux écrans » dans le menu rétablit le mode vidéo précédent.
+1. Prépare la connexion au compteur dans **Connexion**.
+2. Dans le choix du contenu, touche l’application ou **Écran complet de l’iPhone**.
+3. Touche le bouton rond de diffusion iOS, puis confirme **Démarrer la diffusion** dans la fenêtre système.
+4. Avec une application choisie, l’ouverture est déclenchée une fois le service de diffusion et le canal vidéo du TFT connectés. Le bouton **Ouvrir…** reste disponible. En mode écran complet sans app choisie, reviens à l’accueil de l’iPhone et ouvre l’app voulue.
 
-## Localisation
+Le mode choisi reste l’écran complet lorsque Double Interface passe en arrière-plan. Si la diffusion s’arrête, la sortie se met en pause. Le bouton rond permet aussi d’arrêter la diffusion iOS.
 
-Les cartes par défaut attendent une position récente de l’iPhone avant de
-s’ouvrir autour de celle-ci. Accepter la localisation pendant l’utilisation de
-Double Interface avec « Position exacte » activé, puis la demande éventuelle
-du site Waze ou Wikiloc.
-Les liens de traces déjà choisis ne sont pas remplacés à chaque nouvelle position.
+**Ce mode partage l’écran entier du téléphone**, y compris les menus et notifications visibles. Il ne place pas une application externe dans la miniature et ne conserve pas un site web indépendant au TFT pendant l’utilisation d’une autre application sur le téléphone. L’application tierce reste responsable de sa propre autorisation de localisation.
 
-La flèche flottante ouvre la carte du fournisseur autour de la position actuelle.
-Elle ouvre les réglages de Double Interface si la localisation a été refusée.
-En attente de GPS, « Afficher la carte sans position » permet de consulter la
-carte générale. Le menu « … », puis « État et aide », indique la précision reçue.
+## Revenir aux deux fenêtres
 
-Ce recentrage à l’ouverture ne constitue pas un guidage continu : l’affichage
-du point mobile et le suivi d’une trace dépendent des fonctions du site.
+Dans le panneau de diffusion, touche **Reprendre la petite fenêtre sur le TFT**, puis ferme les menus. Les contenus et la position sont conservés. Tu peux aussi sélectionner un site web ou la carte intégrée pour reprendre ce mode. Arrête la diffusion iOS avec le bouton rond lorsqu’elle n’est plus utilisée.
 
-## Portée exacte de l’essai
+En mode deux fenêtres, seule la miniature est envoyée, à environ deux images par seconde. Les menus restent hors de ce flux. L’envoi de la miniature demande de garder Double Interface au premier plan. Les deux contenus disponibles dans ces fenêtres restent une carte intégrée et un site web Waze ou Wikiloc. La carte intégrée et les sites ne sont pas les applications tierces.
 
-Il s’agit des **pages et cartes web officielles**, dans deux fenêtres WebKit.
-Ce mode n’héberge pas les applications iPhone Waze ou Wikiloc et ne donne pas
-leur guidage natif, leur mode hors connexion ou leurs abonnements dans nos fenêtres.
-La carte Waze présente le trafic ; le site Wikiloc permet de consulter des traces
-selon les fonctions qu’il autorise dans son affichage web. Un lien destiné à
-ouvrir l’application iPhone est bloqué avec un message explicite dans cet essai.
+## Mise à jour
 
-Internet est nécessaire : vérifier que l’iPhone garde accès à Internet lorsqu’il
-est connecté au Wi-Fi de la moto. Un refus du site, une page de consentement ou
-une demande de connexion peuvent apparaître. Aucun contournement n’est installé.
+Décompresse puis ouvre **Mettre_a_jour_sur_Mac.command** et sélectionne ton projet habituel. Le script sauvegarde les fichiers remplacés et conserve les réglages de signature. Le nouveau fichier PhoneProjectionView.swift est ajouté automatiquement au groupe synchronisé Xcode.
 
-Le flux utilise des instantanés de la fenêtre web miniature, environ deux par
-seconde. La miniature n’est pas un faux aperçu. Une date récente signifie qu’une
-image a été préparée localement, pas que sa réception sur le TFT a été confirmée.
-L’essai demande de garder Double Interface au premier plan et l’iPhone déverrouillé.
+## État des vérifications
 
-## Vérification à faire sur la moto à l’arrêt
+Le contrôle de syntaxe Swift et les 22 tests Python des scripts sont exécutés ici. Un essai réel de mise à jour vers un projet copié contrôle l’ajout du fichier et la conservation des identifiants. Les nouveaux tests Swift de sélection du flux sont fournis, mais ne sont pas exécutés sans Swift. La compilation Apple, les ouvertures sur iPhone et la réception vidéo sur le TFT ne sont pas validées dans cet environnement.
 
-1. Ouvrir l’essai : vérifier que le TFT affiche Waze, sans recopier l’accueil.
-2. Déplacer/zoomer la grande carte Wikiloc : vérifier que le TFT reste sur Waze.
-3. Déplacer la miniature : vérifier que son contenu reste affiché sur le TFT.
-4. Toucher la miniature : vérifier que Wikiloc devient la nouvelle source du TFT
-   et que Waze reste utilisable en grand sur l’iPhone.
-5. Échanger plusieurs fois et ouvrir/fermer les réglages : vérifier que les pages
-   restent ouvertes et qu’aucun écran de réglages n’est envoyé au TFT.
-6. Fermer puis rouvrir l’essai, interrompre/reconnecter le TFT et tester une perte
-   d’Internet. Noter les erreurs réellement affichées.
-7. Autoriser la localisation : vérifier le centrage autour du lieu réel dans les
-   deux cartes. Tester aussi un refus, puis l’autorisation depuis les réglages.
-8. Vérifier le plein écran en portrait et paysage, déplacer la miniature vers les
-   bords, puis ouvrir le menu flottant et fermer l’essai.
+La demande complète « app tierce interactive dans une fenêtre + autre contenu dans l’autre » reste **non réalisée**. Ce correctif ajoute l’ouverture des applications et réactive le chemin de diffusion de tout l’iPhone ; il ne déclare pas cette demande complète fonctionnelle.
 
-**Ce dossier n’a pas été compilé avec le SDK Apple, installé sur l’iPhone ou validé
-sur le TFT dans l’environnement de préparation.** Les contrôles disponibles sont
-décrits dans `VERIFICATION_ESSAI_WEB.json`.
+Voir ATTENTES_DOUBLE_INTERFACE.md et VERIFICATION_ESSAI_WEB.json.
 
-Documentation des affichages intégrés utilisés :
-- https://developers.google.com/waze/iframe
-- https://help.wikiloc.com/article/259-share-embed-iframe-insert-embed-trail-route-wikiloc-web-blog-digital-online-html
-- https://help.wikiloc.com/article/917-activate-location-permissions
-- https://developer.apple.com/documentation/webkit/wkuidelegate
+## Sources
+
+- Waze : https://developers.google.com/waze/deeplinks/
+- Association Wikiloc : https://www.wikiloc.com/.well-known/apple-app-site-association
+- ReplayKit : https://developer.apple.com/documentation/replaykit/rpsystembroadcastpickerview
+
+Adaptation de KoveMirror, créé par MapaX (Matti Mustonen). Licence MIT et attributions conservées. Application indépendante de Kove, Apple, Waze et Wikiloc.
