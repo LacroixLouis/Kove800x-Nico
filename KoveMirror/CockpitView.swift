@@ -2,47 +2,6 @@ import SwiftUI
 import MapKit
 import UniformTypeIdentifiers
 
-struct CockpitView: View {
-    @ObservedObject var bleController: BleController
-    @State private var independentOutput: Bool = false
-    @State private var tftValue: Int = 0
-
-    // Page courante exemple — conservez votre propre type/enum si vous en avez un
-    private let page = CockpitPage(rawValue: 0)
-
-    private var showingIndependentTFT: Bool {
-        independentOutput && !bleController.externalAppMirroringRequested
-    }
-
-    var body: some View {
-        VStack(spacing: 16) {
-            selectionButton(
-                "TFT",
-                selected: showingIndependentTFT && tftValue == page.rawValue,
-                symbol: "display"
-            )
-        }
-    }
-
-    private func selectionButton(
-        _ title: String,
-        selected: Bool,
-        symbol: String
-    ) -> some View {
-        Button {
-            if selected {
-                tftValue = page.rawValue
-            }
-        } label: {
-            Label(title, systemImage: symbol)
-        }
-    }
-}
-
-private struct CockpitPage {
-    let rawValue: Int
-}
-
 /// The two selectors control our own renderers, never other installed apps.
 struct CockpitView: View {
     @ObservedObject var bleController: BleController
@@ -72,34 +31,34 @@ struct CockpitView: View {
                     Button("Choisir une application", systemImage: "square.grid.2x2.fill", action: onChooseApplication)
                         .buttonStyle(RideButtonStyle())
                         .accessibilityIdentifier("cockpit.chooseApplication")
-            }
-            Text("Les vues de Double Interface.")
-                .font(.system(.largeTitle, design: .rounded).weight(.bold))
-            Text("Choisis séparément la vue du téléphone et celle du compteur parmi nos trois outils intégrés.")
-                .foregroundStyle(RideTheme.muted)
-            RideCard {
-                HStack {
-                    Label("Téléphone", systemImage: "iphone")
-                    Spacer()
-                    Label("Compteur", systemImage: "display")
                 }
-                .font(.caption.weight(.bold)).foregroundStyle(RideTheme.muted)
-                ForEach(CockpitPage.allCases) { page in
-                    VStack(alignment: .leading, spacing: 10) {
-                        Label(page.title, systemImage: page.symbol).font(.headline)
-                        HStack(spacing: 12) {
-                            selectionButton("Téléphone", selected: phonePage == page, symbol: "iphone") {
-                                phoneAppKeepsTFT = false
-                                phoneValue = page.rawValue
-                            }
-                            selectionButton("TFT", selected: showingIndependentTFT && tftValue == page.rawValue, symbol: "display") {
-                                bleController.sendCockpitPage(page)
+                Text("Les vues de Double Interface.")
+                    .font(.system(.largeTitle, design: .rounded).weight(.bold))
+                Text("Choisis séparément la vue du téléphone et celle du compteur parmi nos trois outils intégrés.")
+                    .foregroundStyle(RideTheme.muted)
+                RideCard {
+                    HStack {
+                        Label("Téléphone", systemImage: "iphone")
+                        Spacer()
+                        Label("Compteur", systemImage: "display")
+                    }
+                    .font(.caption.weight(.bold)).foregroundStyle(RideTheme.muted)
+                    ForEach(CockpitPage.allCases) { page in
+                        VStack(alignment: .leading, spacing: 10) {
+                            Label(page.title, systemImage: page.symbol).font(.headline)
+                            HStack(spacing: 12) {
+                                selectionButton("Téléphone", selected: phonePage == page, symbol: "iphone") {
+                                    phoneAppKeepsTFT = false
+                                    phoneValue = page.rawValue
+                                }
+                                selectionButton("TFT", selected: showingIndependentTFT && tftValue == page.rawValue, symbol: "display") {
+                                    bleController.sendCockpitPage(page)
+                                }
                             }
                         }
+                        if page != CockpitPage.allCases.last { Divider() }
                     }
-                    if page != CockpitPage.allCases.last { Divider() }
                 }
-            }
             }
             TimelineView(.periodic(from: .now, by: 1)) { _ in phonePreview }
             if !phoneDisplayOnly {
@@ -113,9 +72,9 @@ struct CockpitView: View {
                         bleController.returnToPhoneMirror()
                     }
                     .buttonStyle(RideButtonStyle(primary: false))
-            }
-            Text("Les vues Double Interface peuvent être différentes sur les deux écrans. Pour une autre application, utilise le bouton « Choisir une application » en haut de cette page.")
-                .font(.caption).foregroundStyle(RideTheme.muted)
+                }
+                Text("Les vues Double Interface peuvent être différentes sur les deux écrans. Pour une autre application, utilise le bouton « Choisir une application » en haut de cette page.")
+                    .font(.caption).foregroundStyle(RideTheme.muted)
             }
         }
         .onAppear { nav.restoreGPX(); nav.requestLocationPermission() }
