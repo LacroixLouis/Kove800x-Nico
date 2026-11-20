@@ -2,6 +2,47 @@ import SwiftUI
 import MapKit
 import UniformTypeIdentifiers
 
+struct CockpitView: View {
+    @ObservedObject var bleController: BleController
+    @State private var independentOutput: Bool = false
+    @State private var tftValue: Int = 0
+
+    // Page courante exemple — conservez votre propre type/enum si vous en avez un
+    private let page = CockpitPage(rawValue: 0)
+
+    private var showingIndependentTFT: Bool {
+        independentOutput && !bleController.externalAppMirroringRequested
+    }
+
+    var body: some View {
+        VStack(spacing: 16) {
+            selectionButton(
+                "TFT",
+                selected: showingIndependentTFT && tftValue == page.rawValue,
+                symbol: "display"
+            )
+        }
+    }
+
+    private func selectionButton(
+        _ title: String,
+        selected: Bool,
+        symbol: String
+    ) -> some View {
+        Button {
+            if selected {
+                tftValue = page.rawValue
+            }
+        } label: {
+            Label(title, systemImage: symbol)
+        }
+    }
+}
+
+private struct CockpitPage {
+    let rawValue: Int
+}
+
 /// The two selectors control our own renderers, never other installed apps.
 struct CockpitView: View {
     @ObservedObject var bleController: BleController
