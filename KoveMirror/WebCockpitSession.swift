@@ -5,7 +5,6 @@ import WebKit
 import CoreLocation
 
 extension Notification.Name {
-    static let nicoNavigationUpdated = Notification.Name("NicoNavigationUpdated")
     static let webPanelSourceChanged = Notification.Name("DoubleInterfaceWebPanelSourceChanged")
 }
 
