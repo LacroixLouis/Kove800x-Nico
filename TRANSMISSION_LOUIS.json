@@ -1,0 +1,19 @@
+{
+  "prepared_at": "2026-11-20T11:52:06+01:00",
+  "for": "Louis",
+  "application": "Double Interface",
+  "source_archive_name": "Double_Interface_source.zip",
+  "source_archive_sha256": "660037890b0c908e080a1787d35799cbc5104ab97d27d0a10baab9ca86cb6e85",
+  "code_revision": "double-interface-v8-plein-ecran-gps-2026-11-20",
+  "code_files_identical_to_delivered_source": 96,
+  "changes_for_handoff": [
+    "Updated README and French handoff guide",
+    "Original README retained",
+    "Git ignore additions for local outputs",
+    "GitHub workflow display name updated"
+  ],
+  "github_repository_created": false,
+  "github_workflow_executed": false,
+  "ios_build_performed": false,
+  "hardware_validation_performed": false
+}

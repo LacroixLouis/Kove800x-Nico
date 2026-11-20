@@ -1,0 +1,47 @@
+[
+  {
+    "asset": "AppOsmAnd",
+    "app": "OsmAnd Cartes, GPS hors ligne",
+    "app_store_id": 934850257,
+    "store_url": "https://apps.apple.com/fr/app/osmand-cartes-gps-hors-ligne/id934850257?uo=4",
+    "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/aa/8d/04/aa8d047b-6ef7-346c-d318-e557680e5480/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/512x512bb.jpg",
+    "retrieved_on": "2026-11-20",
+    "purpose": "Identify the corresponding external application in the launcher. Original unmodified artwork."
+  },
+  {
+    "asset": "AppWaze",
+    "app": "Navigation Waze et trafic",
+    "app_store_id": 323229106,
+    "store_url": "https://apps.apple.com/fr/app/navigation-waze-et-trafic/id323229106?uo=4",
+    "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e2/a1/1a/e2a11a28-860c-1b1c-712b-87f3bb7b530c/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "retrieved_on": "2026-11-20",
+    "purpose": "Identify the corresponding external application in the launcher. Original unmodified artwork."
+  },
+  {
+    "asset": "AppWikiloc",
+    "app": "Wikiloc - Itinéraires du Monde",
+    "app_store_id": 432102730,
+    "store_url": "https://apps.apple.com/fr/app/wikiloc-itin%C3%A9raires-du-monde/id432102730?uo=4",
+    "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e2/cd/11/e2cd112b-f4cb-7026-cf1c-774ddb3e7e37/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "retrieved_on": "2026-11-20",
+    "purpose": "Identify the corresponding external application in the launcher. Original unmodified artwork."
+  },
+  {
+    "asset": "AppPlans",
+    "app": "Plans d’Apple",
+    "app_store_id": 915056765,
+    "store_url": "https://apps.apple.com/fr/app/plans-dapple/id915056765?uo=4",
+    "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/98/53/2e/98532ed4-879d-02f7-5021-84082f28593e/mapsCalistoga-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "retrieved_on": "2026-11-20",
+    "purpose": "Identify the corresponding external application in the launcher. Original unmodified artwork."
+  },
+  {
+    "asset": "AppDMDHub",
+    "app": "DMD HUB",
+    "app_store_id": 6760008925,
+    "store_url": "https://apps.apple.com/fr/app/dmd-hub/id6760008925?uo=4",
+    "artwork_url": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e4/e5/5d/e4e55d62-e202-d12d-0cf5-f85fa6acce3f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/512x512bb.jpg",
+    "retrieved_on": "2026-11-20",
+    "purpose": "Identify the corresponding external application in the launcher. Original unmodified artwork."
+  }
+]

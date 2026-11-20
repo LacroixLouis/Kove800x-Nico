@@ -1,0 +1,45 @@
+{
+  "revision": "double-interface-v8-plein-ecran-gps-2026-11-20",
+  "checked_at": "2026-11-20T11:46:59+01:00",
+  "based_on_library_version": 14,
+  "changes": [
+    "Full-screen phone web map, floating menu, movable TFT miniature within safe bounds",
+    "Phone viewport matches screen aspect ratio; miniature retains the TFT aspect ratio",
+    "Default maps wait for a fresh real location; explicit trail links remain unchanged",
+    "Current-location map action, permission status, and open-app-settings action",
+    "Foreground location request and documented iOS 27 per-site geolocation prompt"
+  ],
+  "swift_syntax": {
+    "parser": "tree-sitter-swift",
+    "files": 84,
+    "result": "passed",
+    "apple_sdk_type_check": false
+  },
+  "python_script_tests": {
+    "executed": 16,
+    "result": "passed"
+  },
+  "swift_unit_tests_added_for_this_change": 3,
+  "swift_unit_tests_executed": false,
+  "ios_build_performed": false,
+  "device_and_TFT_test_performed": false,
+  "scope": "Two WKWebView sessions, full-screen phone map, draggable miniature, tap-to-exchange, and automatic miniature-only H264 output. Initial centering uses actual fresh coordinates. Moving location dot and continuous following depend on provider web capabilities; native Waze/Wikiloc applications are not embedded.",
+  "runtime_checks_pending": [
+    "Full-screen presentation and safe-area behavior on iPhone",
+    "GPS permission flows and actual map centering for both providers",
+    "Native website geolocation prompts on iOS 27",
+    "TFT output after exchanging panels and rotating the phone"
+  ],
+  "manifest_integrity": {
+    "files": 120,
+    "result": "passed"
+  },
+  "actual_manifest_update_smoke_test": {
+    "result": "passed",
+    "personal_bundle_identifier_preserved": true,
+    "personal_callback_scheme_preserved": true,
+    "signing_entitlements_preserved": true,
+    "project_settings_byte_for_byte_preserved": true,
+    "updated_swift_files_delivered": true
+  }
+}

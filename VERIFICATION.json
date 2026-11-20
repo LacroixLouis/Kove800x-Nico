@@ -1,0 +1,42 @@
+{
+  "checked_on": "2026-11-20",
+  "checked_at": "2026-11-20T09:36:10+01:00",
+  "revision": "double-interface-v7-2026-11-20",
+  "based_on_library_version": 9,
+  "app_display_name": "Double Interface",
+  "changes": [
+    "Saved Wi-Fi name removed from the connection sheet",
+    "User-visible branding, icon variants, locales, exports and TFT output renamed",
+    "Signed-project updater applies display names and permission descriptions without replacing signing settings"
+  ],
+  "swift_syntax": {
+    "result": "passed",
+    "parser": "tree-sitter-swift",
+    "files": 76,
+    "apple_sdk_type_check": false
+  },
+  "swift_source_lines": 12338,
+  "python_tests": {
+    "executed": 13,
+    "result": "passed",
+    "suite": "scripts/tests/test_project_update.py"
+  },
+  "actual_manifest_update_smoke_test": {
+    "result": "passed",
+    "managed_files": 105,
+    "personal_bundle_identifiers_preserved": true,
+    "personal_callback_scheme_preserved": true,
+    "only_project_display_name_settings_changed": true,
+    "entitlements_byte_for_byte_preserved": true,
+    "application_and_broadcast_names_updated": true
+  },
+  "formats_checked": {
+    "json_and_string_catalogs": 16,
+    "plists_and_entitlements": 6
+  },
+  "brand_icon_variants_checked": 12,
+  "ios_compilation_performed": false,
+  "apple_signing_performed": false,
+  "new_revision_installed_on_iphone": false,
+  "motorcycle_hardware_test_performed": false
+}

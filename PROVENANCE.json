@@ -1,0 +1,14 @@
+{
+  "name": "NicoMirror",
+  "target": "iPhone vers compteur TFT Kove 800X Rally ThinkerRide",
+  "upstream": "https://github.com/MapaX/KoveMirror",
+  "upstream_commit": "e348d56045d1be554c3bd41df76ee047b909b73f",
+  "upstream_license": "MIT",
+  "upstream_copyright": "Copyright (c) 2026 MapaX",
+  "prepared_on": "2026-11-19",
+  "ios_build_performed": false,
+  "apple_signing_performed": false,
+  "hardware_test_performed": false,
+  "personalized_testflight_published": false,
+  "upstream_testflight_invitation": "https://testflight.apple.com/join/H85r5Zrx"
+}
