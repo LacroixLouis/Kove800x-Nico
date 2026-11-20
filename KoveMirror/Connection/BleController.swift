@@ -216,7 +216,7 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     private var heartbeatTimer: Timer?
     private var mileageTimer: Timer?
     private var hasSentHandshake = false
-    private let appGroupSuiteName = "group.com.nicolasrivet.NicoMirror"
+    private let appGroupSuiteName = KoveScreenPreset.appGroupSuiteName
     
     private let logQueue = DispatchQueue(label: "com.kove.mirror.log", qos: .utility)
     private let dateFormatter: DateFormatter = {
