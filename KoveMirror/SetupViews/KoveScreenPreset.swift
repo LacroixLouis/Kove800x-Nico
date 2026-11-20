@@ -136,7 +136,25 @@ enum KoveScreenPreset: String, CaseIterable, Identifiable {
         }
     }
     
-    static let appGroupSuiteName = "group.com.nicolasrivet.NicoMirror"
+        static let defaultAppGroupSuiteName = "group.com.nicolasrivet.NicoMirror"
+    static let appGroupSuiteName: String = resolveAppGroupSuiteName()
+
+    private static func resolveAppGroupSuiteName() -> String {
+        func groups(in bundle: Bundle?) -> [String] {
+            bundle?.object(forInfoDictionaryKey: "ALTAppGroups") as? [String] ?? []
+        }
+        var candidates: [Bundle?] = [Bundle.main]
+        if Bundle.main.bundleURL.pathExtension == "appex" {
+            let host = Bundle.main.bundleURL.deletingLastPathComponent().deletingLastPathComponent()
+            candidates.append(Bundle(url: host))
+        }
+        for bundle in candidates {
+            if let name = groups(in: bundle).first(where: { $0.hasPrefix("group.") }) {
+                return name
+            }
+        }
+        return defaultAppGroupSuiteName
+    }
     static let presetKey = "selected_kove_screen_preset"
     static let topPaddingKey = "screen_top_padding"
     static let bottomPaddingKey = "screen_bottom_padding"
