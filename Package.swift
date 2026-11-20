@@ -10,7 +10,7 @@ let package = Package(
             name: "NicoMirrorConnection",
             path: "KoveMirror/SetupViews",
             exclude: ["QRScannerSheet.swift", "QRCodeScannerView.swift", "ProximityTransparentOverlay.swift", "SettingsView.swift"],
-            sources: ["KoveScreenPreset.swift", "MotorcycleWiFiCredentials.swift", "NewlinePacketBuffer.swift", "ProjectionPolicy.swift", "AnnexBResynchronizer.swift", "GPXTrack.swift", "TFTConnectionPolicy.swift", "CockpitPage.swift", "DashboardLayout.swift", "MotorcycleMaintenance.swift", "CockpitWeather.swift", "RivetLanguage.swift", "WebPanelLayout.swift"]
+            sources: ["KoveScreenPreset.swift", "MotorcycleWiFiCredentials.swift", "NewlinePacketBuffer.swift", "ProjectionPolicy.swift", "AnnexBResynchronizer.swift", "GPXTrack.swift", "TFTConnectionPolicy.swift", "CockpitPage.swift", "DashboardLayout.swift", "MotorcycleMaintenance.swift", "CockpitWeather.swift", "RivetLanguage.swift", "WebPanelLayout.swift", "NavigationAppChoice.swift"]
         ),
         .testTarget(name: "NicoMirrorConnectionTests", dependencies: ["NicoMirrorConnection"], path: "Tests/Connection")
     ]
