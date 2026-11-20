@@ -22,6 +22,7 @@ class BleController: NSObject, ObservableObject, CBCentralManagerDelegate, CBPer
     @Published var connectedDeviceName: String? = nil
     @Published var isStreaming = false
     @Published private(set) var isTFTControlConnected = false
+    @Published var externalAppMirroringRequested: Bool = false
     private var tftSessionRequested = true
     private var manualDisconnectRequested = false
     private var automaticConnectionEnabled: Bool {
